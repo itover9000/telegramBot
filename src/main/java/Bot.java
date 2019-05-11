@@ -1,3 +1,6 @@
+import model.ModelBored;
+import model.ModelCurrency;
+import model.ModelWeather;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -9,6 +12,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
+import pojo.BoredApi;
+import pojo.Currency;
+import pojo.Weather;
+import util.YandexTranslateUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +36,7 @@ public class Bot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         ModelWeather modelWeather = new ModelWeather();
         ModelCurrency modelCurrency = new ModelCurrency();
+        ModelBored modelBored = new ModelBored();
         Message message = update.getMessage();
 
         if (message != null && message.hasText()) {
@@ -36,12 +44,17 @@ public class Bot extends TelegramLongPollingBot {
                 case "/help":
                     sendMsg(message, "чем могу помочь?");
                     break;
-                case "/settings":
-                    sendMsg(message, "что будем настраивать");
+                case "скучно!":
+//                    sendMsg(message, "что будем настраивать");
+                    try {
+                       sendMsg(message, BoredApi.getBored(modelBored));
+                    } catch (IOException e) {
+                        sendMsg(message, "чтото пошло не так");
+                    }
                     break;
                 case "/курс валют":
                     try {
-                        sendMsg(message, Currency.getCurrency( modelCurrency));
+                        sendMsg(message, Currency.getCurrency(modelCurrency));
                     } catch (IOException e) {
                         sendMsg(message, "неизвестная ошибка");
                     }
@@ -83,7 +96,7 @@ public class Bot extends TelegramLongPollingBot {
         KeyboardRow keyboardFirstRow = new KeyboardRow();
 
         keyboardFirstRow.add(new KeyboardButton("/help"));
-        keyboardFirstRow.add(new KeyboardButton("/settings"));
+        keyboardFirstRow.add(new KeyboardButton("скучно!"));
         keyboardFirstRow.add(new KeyboardButton("/курс валют"));
 
         keyboardRows.add(keyboardFirstRow);

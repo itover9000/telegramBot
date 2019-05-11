@@ -1,4 +1,8 @@
+package pojo;
+
+import model.ModelCurrency;
 import org.json.JSONObject;
+import util.ReadJSONUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +23,7 @@ public class Currency {
         }};
 
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.mm.yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
         String currentDate = simpleDateFormat.format(date);
 
         StringBuilder finalAnswer = new StringBuilder("Курс валют на " + currentDate + "\n");
@@ -27,14 +31,7 @@ public class Currency {
         for (Integer idCurrency : currencyList) {
 
             URL url = new URL("http://www.nbrb.by/API/ExRates/Rates/" + idCurrency);
-            Scanner in = new Scanner((InputStream) url.getContent());
-            StringBuilder result = new StringBuilder();
-            while (in.hasNext()) {
-                result.append(in.nextLine());
-            }
-
-
-            JSONObject object = new JSONObject(String.valueOf(result));
+            JSONObject object = ReadJSONUtil.readJSONFromUrl(url);
 
             String abbreviation = object.getString("Cur_Abbreviation");
             if (abbreviation.equals("RUB")){

@@ -1,5 +1,9 @@
+package pojo;
+
+import model.ModelWeather;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import util.ReadJSONUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,13 +15,8 @@ public class Weather {
     public static String getWeather(String message, ModelWeather modelWeather) throws IOException {
         URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q="
                 + message + "&units=metric&appid=6621cca782054fa6e402deac83420b10");
-        Scanner in = new Scanner((InputStream) url.getContent());
-        StringBuilder result = new StringBuilder();
-        while (in.hasNext()) {
-            result.append(in.nextLine());
-        }
 
-        JSONObject object = new JSONObject(String.valueOf(result));
+        JSONObject object = ReadJSONUtil.readJSONFromUrl(url);
         modelWeather.setName(object.getString("name"));
 
         JSONObject main = object.getJSONObject("main");
