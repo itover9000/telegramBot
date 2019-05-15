@@ -17,6 +17,7 @@ import service.BoredApi;
 import service.Currency;
 import service.GeomagneticStorm;
 import service.Weather;
+import util.GeomagneticStormUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiRequestException e) {
             e.printStackTrace();
         }
+
+
     }
 
     public void onUpdateReceived(Update update) {
@@ -40,20 +43,19 @@ public class Bot extends TelegramLongPollingBot {
         BoredModel boredModel = new BoredModel();
         GeomagneticStormModel stormModel = new GeomagneticStormModel();
         Message message = update.getMessage();
+        GeomagneticStorm geomagneticStorm = new GeomagneticStorm();
 
         if (message != null && message.hasText()) {
             switch (message.getText().toLowerCase()) {
                 case "магн. буря":
-                    sendMsg(message, "чем могу помочь?");
-                    break;
-                case "скучно!":
                     try {
-                        sendMsg(message, GeomagneticStorm.getGeomagneticStorm(stormModel));
+                        sendMsg(message, geomagneticStorm.getGeomagneticStorm(stormModel));
                     } catch (IOException e) {
                         sendMsg(message, "чтото пошло не так");
                         System.out.println(e.toString());
                     }
-
+                    break;
+                case "скучно!":
                     try {
                        sendMsg(message, BoredApi.getBored(boredModel));
                     } catch (IOException e) {
@@ -75,6 +77,8 @@ public class Bot extends TelegramLongPollingBot {
                     }
             }
         }
+//        GeomagneticStormUtil.checkStormEvery3Hour(new GeomagneticStormModel());
+//        sendMsg(message, GeomagneticStormUtil.check(stormModel));
     }
 
     private void sendMsg(Message message, String text) {

@@ -19,7 +19,7 @@ import java.util.TimeZone;
 
 public class GeomagneticStorm {
 
-    public static String parseGeomagneticStorm(String dateForParse) {
+    private static String parseGeomagneticStorm(String dateForParse) {
         //set pattern
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date result;
@@ -38,7 +38,7 @@ public class GeomagneticStorm {
         return format.toLocalizedPattern();
     }
 
-    public static String getGeomagneticStorm(GeomagneticStormModel stormModel) throws IOException {
+    public String getGeomagneticStorm(GeomagneticStormModel stormModel) throws IOException {
 
         URL url = new URL("https://services.swpc.noaa.gov/json/planetary_k_index_1m.json");
         String jsonStringFormat = ReadJSONUtil.getJSONStringFormat(url);
@@ -52,10 +52,16 @@ public class GeomagneticStorm {
 
             if (!listStormModel.isEmpty()) {
                 stormModel = listStormModel.get(listStormModel.size() - 1);
-                return "Индекс шторма = " + stormModel.getKp_index() + "\n" +
+                String returnText = "Индекс шторма = " + stormModel.getKp_index() + "\n" +
                         "время " + parseGeomagneticStorm(stormModel.getTime_tag());
+                if (stormModel.getKp_index() > 4){
+                    returnText += "\nВнимание, сильная буря!";
+                }
+                return returnText;
             }
         }
         return "не удалось получить данные";
     }
+
+
 }
