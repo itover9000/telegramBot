@@ -1,6 +1,7 @@
-import model.ModelBored;
-import model.ModelCurrency;
-import model.ModelWeather;
+import model.BoredModel;
+import model.CurrencyModel;
+import model.GeomagneticStormModel;
+import model.WeatherModel;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -12,10 +13,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
-import pojo.BoredApi;
-import pojo.Currency;
-import pojo.Weather;
-import util.YandexTranslateUtil;
+import service.BoredApi;
+import service.Currency;
+import service.GeomagneticStorm;
+import service.Weather;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,34 +35,41 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public void onUpdateReceived(Update update) {
-        ModelWeather modelWeather = new ModelWeather();
-        ModelCurrency modelCurrency = new ModelCurrency();
-        ModelBored modelBored = new ModelBored();
+        WeatherModel weatherModel = new WeatherModel();
+        CurrencyModel currencyModel = new CurrencyModel();
+        BoredModel boredModel = new BoredModel();
+        GeomagneticStormModel stormModel = new GeomagneticStormModel();
         Message message = update.getMessage();
 
         if (message != null && message.hasText()) {
-            switch (message.getText()) {
-                case "/help":
+            switch (message.getText().toLowerCase()) {
+                case "магн. буря":
                     sendMsg(message, "чем могу помочь?");
                     break;
                 case "скучно!":
-//                    sendMsg(message, "что будем настраивать");
                     try {
-                       sendMsg(message, BoredApi.getBored(modelBored));
+                        sendMsg(message, GeomagneticStorm.getGeomagneticStorm(stormModel));
+                    } catch (IOException e) {
+                        sendMsg(message, "чтото пошло не так");
+                        System.out.println(e.toString());
+                    }
+
+                    try {
+                       sendMsg(message, BoredApi.getBored(boredModel));
                     } catch (IOException e) {
                         sendMsg(message, "чтото пошло не так");
                     }
                     break;
-                case "/курс валют":
+                case "курс валют":
                     try {
-                        sendMsg(message, Currency.getCurrency(modelCurrency));
+                        sendMsg(message, Currency.getCurrency(currencyModel));
                     } catch (IOException e) {
                         sendMsg(message, "неизвестная ошибка");
                     }
                     break;
                 default:
                     try {
-                        sendMsg(message, Weather.getWeather(message.getText(), modelWeather));
+                        sendMsg(message, Weather.getWeather(message.getText(), weatherModel));
                     } catch (IOException e) {
                         sendMsg(message, "такой город не найден");
                     }
@@ -95,9 +103,9 @@ public class Bot extends TelegramLongPollingBot {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
 
-        keyboardFirstRow.add(new KeyboardButton("/help"));
+        keyboardFirstRow.add(new KeyboardButton("магн. буря"));
         keyboardFirstRow.add(new KeyboardButton("скучно!"));
-        keyboardFirstRow.add(new KeyboardButton("/курс валют"));
+        keyboardFirstRow.add(new KeyboardButton("курс валют"));
 
         keyboardRows.add(keyboardFirstRow);
         keyboardMarkup.setKeyboard(keyboardRows);

@@ -1,21 +1,19 @@
-package pojo;
+package service;
 
-import model.ModelCurrency;
+import model.CurrencyModel;
 import org.json.JSONObject;
 import util.ReadJSONUtil;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 
 public class Currency {
 
-    public static String getCurrency(ModelCurrency modelCurrency) throws IOException {
+    public static String getCurrency(CurrencyModel currencyModel) throws IOException {
         List<Integer> currencyList = new ArrayList<Integer>() {{
             add(145);
             add(292);
@@ -38,12 +36,12 @@ public class Currency {
                 abbreviation = "100RUB";
             }
             double officialRate = object.getDouble("Cur_OfficialRate");
-            modelCurrency.setAbbreviation(abbreviation);
-            modelCurrency.setOfficialRate(officialRate);
+            currencyModel.setAbbreviation(abbreviation);
+            currencyModel.setOfficialRate(officialRate);
 
-            finalAnswer.append(modelCurrency.getAbbreviation())
+            finalAnswer.append(currencyModel.getAbbreviation())
                     .append(" равен ")
-                    .append(modelCurrency.getOfficialRate())
+                    .append(currencyModel.getOfficialRate())
                     .append("\n");
         }
 

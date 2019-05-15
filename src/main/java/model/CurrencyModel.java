@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class ModelCurrency {
+public class CurrencyModel {
     private String date;
     private String abbreviation;
     private Double officialRate;

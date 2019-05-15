@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModelWeather {
+public class WeatherModel {
 
     private String name;
     private Double temp;

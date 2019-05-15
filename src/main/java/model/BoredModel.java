@@ -3,7 +3,7 @@ package model;
 import lombok.Data;
 
 @Data
-public class ModelBored {
+public class BoredModel {
     private String activity;
     private int participants;
 }

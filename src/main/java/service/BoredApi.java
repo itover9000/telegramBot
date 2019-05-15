@@ -1,6 +1,6 @@
-package pojo;
+package service;
 
-import model.ModelBored;
+import model.BoredModel;
 import org.json.JSONObject;
 import util.ReadJSONUtil;
 import util.YandexTranslateUtil;
@@ -11,7 +11,7 @@ import java.net.URL;
 public class BoredApi {
     private static final String urlPath = "https://www.boredapi.com/api/activity";
 
-    public static String getBored(ModelBored bored) throws IOException {
+    public static String getBored(BoredModel bored) throws IOException {
         URL url = new URL(urlPath);
         JSONObject object = ReadJSONUtil.readJSONFromUrl(url);
 
