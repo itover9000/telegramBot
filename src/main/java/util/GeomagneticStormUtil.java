@@ -24,7 +24,7 @@ public class GeomagneticStormUtil {
     public static void checkStormEvery3Hour(GeomagneticStormModel stormModel) {
 
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> check(stormModel), 0, 10, TimeUnit.SECONDS);
+        service.scheduleAtFixedRate(() -> check(stormModel), 0, 3, TimeUnit.HOURS);
     }
 
     private static void check(GeomagneticStormModel stormModel) {
