@@ -4,40 +4,36 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import model.GeomagneticStormModel;
 import service.GeomagneticStorm;
+import service.Sender;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class GeomagneticStormUtil {
     private static GeomagneticStorm geomagneticStorm = new GeomagneticStorm();
+    private static Sender sender = new Sender("h.dabravolskay@yandex.ru", "tratata88");
 
+    //проверка бури с индексом > 4 каждые 3 часа и отправка ссобщения на эл. почту
     public static void checkStormEvery3Hour(GeomagneticStormModel stormModel) {
-        Thread task = new Thread(() -> {
-            while (true) {
-                try {
-//                    Thread.sleep(3 * 60 * 60 * 1000);
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                check(stormModel);
-            }
-        });
-        task.start();
 
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(() -> check(stormModel), 0, 3, TimeUnit.HOURS);
     }
 
-    public static String check(GeomagneticStormModel stormModel) {
-//        String geomagneticStorm = "132";
+    private static String check(GeomagneticStormModel stormModel) {
         String stormGeomagneticStorm = "нет данных";
         try {
             GeomagneticStormModel stormModelForCheck = getStormModel(stormModel);
-            if (stormModelForCheck.getKp_index() > 2) {
+            if (stormModelForCheck.getKp_index() > 4) {
                 String storm = GeomagneticStormUtil.geomagneticStorm.getGeomagneticStorm(stormModel);
-                System.out.println(storm);
+                sender.send("Геомагнитная буря!", storm, "h.dabravolskay@yandex.ru", "over9000@tut.by");
+//                System.out.println(storm);
                 return storm;
             }
         } catch (IOException e) {

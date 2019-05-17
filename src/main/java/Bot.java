@@ -34,6 +34,9 @@ public class Bot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
 
+        //проверка бури с индексом > 4 каждые 3 часа и отправка ссобщения на эл. почту
+        GeomagneticStormUtil.checkStormEvery3Hour(new GeomagneticStormModel());
+
 
     }
 
@@ -77,8 +80,6 @@ public class Bot extends TelegramLongPollingBot {
                     }
             }
         }
-//        GeomagneticStormUtil.checkStormEvery3Hour(new GeomagneticStormModel());
-//        sendMsg(message, GeomagneticStormUtil.check(stormModel));
     }
 
     private void sendMsg(Message message, String text) {
