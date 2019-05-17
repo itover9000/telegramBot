@@ -52,7 +52,7 @@ public class GeomagneticStorm {
 
             if (!listStormModel.isEmpty()) {
                 stormModel = listStormModel.get(listStormModel.size() - 1);
-                String returnText = "Индекс шторма = " + stormModel.getKp_index() + "\n" +
+                String returnText = "Kp индекс шторма = " + stormModel.getKp_index() + "\n" +
                         "время " + parseGeomagneticStorm(stormModel.getTime_tag());
                 if (stormModel.getKp_index() > 4){
                     returnText += "\nВнимание, сильная буря!";
