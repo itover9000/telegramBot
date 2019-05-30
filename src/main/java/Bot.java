@@ -71,6 +71,7 @@ public class Bot extends TelegramLongPollingBot {
                         execute(new SendPhoto()
                                 .setPhoto(MeteoradarUtil.getImageFromUrl())
                                 .setChatId("298076685"));
+                        sendMsg(message, MeteoradarUtil.getTimeFromSite());
                     } catch (TelegramApiException | IOException e) {
                         sendMsg(message, "чтото пошло не так");
                     }
