@@ -6,8 +6,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
+import java.util.Date;
 import java.util.TimeZone;
 
 public class MeteoradarUtil {
@@ -26,16 +27,21 @@ public class MeteoradarUtil {
     }
 
 
-    public static String getTimeFromSite() {
+    public static String getTimeFromSite() throws ParseException {
+        try {
+            getImageFromUrl();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (title != null && !title.isEmpty()) {
             String validTime = parseTitleFromTime(title);
 
             if (validTime != null && !validTime.isEmpty()) {
-                SimpleDateFormat sdf = new SimpleDateFormat(validTime);
-                //set TimeZone Minsk
-                sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Europe/Minsk")));
-
-                return sdf.toLocalizedPattern();
+                //устанавливаем часовой пояс
+                SimpleDateFormat isoFormat = new SimpleDateFormat("hh:mm");
+                isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Date date = isoFormat.parse(validTime);
+                return date.getHours() + ":" + date.getMinutes();
             }
         }
         return "неверный формат";
@@ -52,9 +58,5 @@ public class MeteoradarUtil {
             }
         }
         return resultTime;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(MeteoradarUtil.getTimeFromSite());
     }
 }

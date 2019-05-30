@@ -26,6 +26,7 @@ import util.MeteoradarUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class Bot extends TelegramLongPollingBot {
                                 .setPhoto(MeteoradarUtil.getImageFromUrl())
                                 .setChatId("298076685"));
                         sendMsg(message, MeteoradarUtil.getTimeFromSite());
-                    } catch (TelegramApiException | IOException e) {
+                    } catch (TelegramApiException | IOException | ParseException e ) {
                         sendMsg(message, "чтото пошло не так");
                     }
                     break;
