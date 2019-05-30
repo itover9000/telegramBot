@@ -5,9 +5,13 @@ import model.WeatherModel;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -18,7 +22,9 @@ import service.Currency;
 import service.GeomagneticStorm;
 import service.Weather;
 import util.GeomagneticStormUtil;
+import util.MeteoradarUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,14 +59,36 @@ public class Bot extends TelegramLongPollingBot {
                 case "магн. буря":
                     try {
                         sendMsg(message, geomagneticStorm.getGeomagneticStorm(stormModel));
+
                     } catch (IOException e) {
                         sendMsg(message, "чтото пошло не так");
                         System.out.println(e.toString());
                     }
                     break;
+
+                case "текущая погода":
+                    try {
+                        execute(new SendPhoto()
+                                .setPhoto(MeteoradarUtil.getImageFromUrl())
+                                .setChatId("298076685"));
+                    } catch (TelegramApiException | IOException e) {
+                        sendMsg(message, "чтото пошло не так");
+                    }
+                    break;
+
+                case "анимация погоды":
+                    try {
+                        execute(new SendAnimation()
+                                .setAnimation("http://www.meteoinfo.by/radar/UMMN/radar-map.gif")
+                                .setChatId("298076685"));
+                    } catch (TelegramApiException e) {
+                        sendMsg(message, "чтото пошло не так");
+                    }
+                    break;
+
                 case "скучно!":
                     try {
-                       sendMsg(message, BoredApi.getBored(boredModel));
+                        sendMsg(message, BoredApi.getBored(boredModel));
                     } catch (IOException e) {
                         sendMsg(message, "чтото пошло не так");
                     }
@@ -72,6 +100,7 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, "неизвестная ошибка");
                     }
                     break;
+
                 default:
                     try {
                         sendMsg(message, Weather.getWeather(message.getText(), weatherModel));
@@ -98,7 +127,7 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public void setButton(SendMessage message) {
+    private void setButton(SendMessage message) {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         message.setReplyMarkup(keyboardMarkup);
         keyboardMarkup.setSelective(true);
@@ -107,12 +136,16 @@ public class Bot extends TelegramLongPollingBot {
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
+        KeyboardRow keyboardSecondRow = new KeyboardRow();
 
         keyboardFirstRow.add(new KeyboardButton("магн. буря"));
         keyboardFirstRow.add(new KeyboardButton("скучно!"));
         keyboardFirstRow.add(new KeyboardButton("курс валют"));
+        keyboardSecondRow.add(new KeyboardButton("текущая погода"));
+        keyboardSecondRow.add(new KeyboardButton("анимация погоды"));
 
         keyboardRows.add(keyboardFirstRow);
+        keyboardRows.add(keyboardSecondRow);
         keyboardMarkup.setKeyboard(keyboardRows);
 
 
