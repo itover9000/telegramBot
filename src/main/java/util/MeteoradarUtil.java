@@ -39,7 +39,7 @@ public class MeteoradarUtil {
             if (validTime != null && !validTime.isEmpty()) {
                 //устанавливаем часовой пояс
                 SimpleDateFormat isoFormat = new SimpleDateFormat("hh:mm");
-                isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Minsk"));
                 Date date = isoFormat.parse(validTime);
                 return date.getHours() + ":" + date.getMinutes();
             }

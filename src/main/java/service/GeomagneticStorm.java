@@ -62,6 +62,4 @@ public class GeomagneticStorm {
         }
         return "не удалось получить данные";
     }
-
-
 }
