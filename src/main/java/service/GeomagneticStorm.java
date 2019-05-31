@@ -28,7 +28,9 @@ public class GeomagneticStorm {
             result = df.parse(dateForParse);
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
             //set TimeZone Minsk
-            sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Europe/Minsk")));
+//            sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Europe/Minsk")));
+            //вручную вбил, но это не правильно
+            sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Etc/GMT-6")));
             format = new SimpleDateFormat(sdf.format(result));
 
             return format.toLocalizedPattern();

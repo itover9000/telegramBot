@@ -5,7 +5,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.*;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,8 +41,8 @@ public class MeteoradarUtil {
 
             if (validTime != null && !validTime.isEmpty()) {
                 //устанавливаем часовой пояс
-                SimpleDateFormat isoFormat = new SimpleDateFormat("hh:mm");
-                isoFormat.setTimeZone(TimeZone.getTimeZone("America/Recife"));
+                SimpleDateFormat isoFormat = new SimpleDateFormat("HH:mm");
+                isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 Date date = isoFormat.parse(validTime);
                 return date.getHours() + ":" + date.getMinutes();
             }
@@ -55,8 +58,37 @@ public class MeteoradarUtil {
         for (String time : splitText) {
             if (validator.validate(time)) {
                 resultTime = time;
+                break;
             }
         }
         return resultTime;
     }
+
+    public static String getPathToGifFile(String urlForDownloadGif) throws IOException {
+        File file = new File("radar-map.gif");
+        URL website = new URL(urlForDownloadGif);
+
+        if (!file.exists()) {
+            //если файла не существует, то качаем и копируем в корень проекта
+            copyGifToRootProject(file, website);
+        } else {
+            long contentLengthGif = website.openConnection().getContentLengthLong();
+            //если файл отличается по размеру, то заменяем на новый файл
+            if (file.length() != contentLengthGif ) {
+                copyGifToRootProject(file, website);
+            }
+        }
+        return file.toString();
+    }
+
+    private static void copyGifToRootProject(File file, URL website) throws IOException {
+        ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+        FileOutputStream fos = new FileOutputStream(file.toString());
+        fos.getChannel().transferFrom(rbc, 0, 5 * 1024 * 1024);
+    }
+
+    public static void main(String[] args) throws IOException {
+        getPathToGifFile("http://www.meteoinfo.by/radar/UMMN/radar-map.gif");
+    }
 }
+
