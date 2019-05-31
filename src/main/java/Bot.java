@@ -58,7 +58,7 @@ public class Bot extends TelegramLongPollingBot {
         GeomagneticStorm geomagneticStorm = new GeomagneticStorm();
 
         if (message != null && message.hasText()) {
-            switch (message.getText().toLowerCase()) {
+            switch (message.getText().toLowerCase().trim()) {
                 case "магн. буря":
                     try {
                         sendMsg(message, geomagneticStorm.getGeomagneticStorm(stormModel));
