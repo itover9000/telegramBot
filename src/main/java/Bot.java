@@ -67,23 +67,20 @@ public class Bot extends TelegramLongPollingBot {
                     }
                     break;
 
-                case "текущая погода":
+                case "текущая погода с анимацией":
                     try {
+                        //пересылаю картинку с сайта
                         execute(new SendPhoto()
                                 .setPhoto(MeteoradarUtil.getImageFromUrl())
                                 .setChatId("298076685"));
+                        //сообщение о времени картинки
                         sendMsg(message, MeteoradarUtil.getTimeFromSite());
-                    } catch (TelegramApiException | IOException | ParseException e ) {
-                        sendMsg(message, "чтото пошло не так");
-                    }
-                    break;
 
-                case "анимация погоды":
-                    try {
+                        //пересылаю анимацию о погоде за последние 3 часа
                         execute(new SendAnimation()
                                 .setAnimation("http://www.meteoinfo.by/radar/UMMN/radar-map.gif")
                                 .setChatId("298076685"));
-                    } catch (TelegramApiException e) {
+                    } catch (TelegramApiException | IOException | ParseException e ) {
                         sendMsg(message, "чтото пошло не так");
                     }
                     break;
@@ -143,8 +140,8 @@ public class Bot extends TelegramLongPollingBot {
         keyboardFirstRow.add(new KeyboardButton("магн. буря"));
         keyboardFirstRow.add(new KeyboardButton("скучно!"));
         keyboardFirstRow.add(new KeyboardButton("курс валют"));
-        keyboardSecondRow.add(new KeyboardButton("текущая погода"));
-        keyboardSecondRow.add(new KeyboardButton("анимация погоды"));
+        keyboardSecondRow.add(new KeyboardButton("текущая погода с анимацией"));
+//        keyboardSecondRow.add(new KeyboardButton("анимация погоды"));
 
         keyboardRows.add(keyboardFirstRow);
         keyboardRows.add(keyboardSecondRow);
