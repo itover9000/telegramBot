@@ -38,15 +38,19 @@ public class MeteoradarUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return getTimeFromSiteWithNewTime(title);
+    }
+
+    public static String getTimeFromSiteWithNewTime(String title) throws ParseException {
         if (title != null && !title.isEmpty()) {
             String validTime = parseTitleFromTime(title);
 
             if (validTime != null && !validTime.isEmpty()) {
                 //устанавливаем часовой пояс
-                SimpleDateFormat castomFormat = new SimpleDateFormat("HH:mm");
-                castomFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                SimpleDateFormat customFormat = new SimpleDateFormat("HH:mm");
+                customFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 //получили дату с новым часовым поясом
-                Date date = castomFormat.parse(validTime);
+                Date date = customFormat.parse(validTime);
 
                 //вывод времени в формате HH:mm в корректном виде (раньше  16:00 выводило как 16:0, теперь корректно)
                 return new SimpleDateFormat("HH:mm").format(date);
@@ -55,7 +59,7 @@ public class MeteoradarUtil {
         return "неверный формат";
     }
 
-    private static String parseTitleFromTime(String text) {
+    public static String parseTitleFromTime(String text) {
         //возвращаем из текста время в формате HH:mm
         Time24HoursValidator validator = new Time24HoursValidator();
         String resultTime = "";
@@ -91,5 +95,9 @@ public class MeteoradarUtil {
         FileOutputStream fos = new FileOutputStream(file.toString());
         //максимальный размер 5Mb
         fos.getChannel().transferFrom(rbc, 0, 5 * 1024 * 1024);
+    }
+
+    public static String getLink() {
+        return link;
     }
 }
