@@ -5,8 +5,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
@@ -41,10 +43,13 @@ public class MeteoradarUtil {
 
             if (validTime != null && !validTime.isEmpty()) {
                 //устанавливаем часовой пояс
-                SimpleDateFormat isoFormat = new SimpleDateFormat("HH:mm");
-                isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                Date date = isoFormat.parse(validTime);
-                return date.getHours() + ":" + date.getMinutes();
+                SimpleDateFormat castomFormat = new SimpleDateFormat("HH:mm");
+                castomFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                //получили дату с новым часовым поясом
+                Date date = castomFormat.parse(validTime);
+
+                //вывод времени в формате HH:mm в корректном виде (раньше  16:00 выводило как 16:0, теперь корректно)
+                return new SimpleDateFormat("HH:mm").format(date);
             }
         }
         return "неверный формат";
@@ -84,11 +89,7 @@ public class MeteoradarUtil {
     private static void copyGifToRootProject(File file, URL website) throws IOException {
         ReadableByteChannel rbc = Channels.newChannel(website.openStream());
         FileOutputStream fos = new FileOutputStream(file.toString());
+        //максимальный размер 5Mb
         fos.getChannel().transferFrom(rbc, 0, 5 * 1024 * 1024);
     }
-
-    public static void main(String[] args) throws IOException {
-        getPathToGifFile("http://www.meteoinfo.by/radar/UMMN/radar-map.gif");
-    }
 }
-
