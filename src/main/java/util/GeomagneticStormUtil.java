@@ -63,6 +63,7 @@ public class GeomagneticStormUtil {
             }.getType();
             List<GeomagneticStormModel> listStormModel = gson.fromJson(jsonStringFormat, collectionType);
 
+            //смотрим индекс на ближайшее время
             if (!listStormModel.isEmpty()) {
                 stormModel = listStormModel.get(listStormModel.size() - 1);
                 return stormModel;

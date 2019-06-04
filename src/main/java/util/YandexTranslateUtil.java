@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class YandexTranslateUtil {
      private static final String key = "key=trnsl.1.1.20190511T083532Z.659a23627272fcf1.ab2b6c844422017a936d29c902783ebb3659700a";
@@ -20,7 +21,9 @@ public class YandexTranslateUtil {
         for (int i = 0; i < jsonArray.length(); i++) {
             translate.append(jsonArray.getString(i));
         }
-        return String.valueOf(translate);
+
+        //устанавливаю кодировку UTF_8 для корректного отображения
+        return new String(String.valueOf(translate).getBytes(), StandardCharsets.UTF_8);
     }
 
 }

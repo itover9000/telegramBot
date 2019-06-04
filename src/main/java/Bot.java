@@ -6,12 +6,10 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
-import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -26,8 +24,7 @@ import util.MeteoradarUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +53,12 @@ public class Bot extends TelegramLongPollingBot {
         GeomagneticStormModel stormModel = new GeomagneticStormModel();
         Message message = update.getMessage();
         GeomagneticStorm geomagneticStorm = new GeomagneticStorm();
+        BoredApi boredApi = null;
+        try {
+            boredApi = new BoredApi();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
 
         if (message != null && message.hasText()) {
             switch (message.getText().toLowerCase().trim()) {
@@ -104,7 +107,7 @@ public class Bot extends TelegramLongPollingBot {
                     break;
                 case "скучно!":
                     try {
-                        sendMsg(message, BoredApi.getBored(boredModel));
+                        sendMsg(message, boredApi.getBoredStringFormat(boredModel));
                     } catch (IOException e) {
                         sendMsg(message, "что-то пошло не так");
                     }
