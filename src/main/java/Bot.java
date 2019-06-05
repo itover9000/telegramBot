@@ -5,9 +5,9 @@ import model.WeatherModel;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -89,15 +89,15 @@ public class Bot extends TelegramLongPollingBot {
                 case "анимация погоды":
                     try {
                         //пересылаю анимацию о погоде за последние 3 часа
+                        //Качественная гифка только если отправлять через SendVideo
                        /* Если передавать .setAnimation("http://www.meteoinfo.by/radar/UMMN/radar-map.gif")
                        * то приходит гифка за 2017 год ????
                        * поэтому такой костыль*/
 
-                        execute(new SendAnimation()
-                                .setAnimation(new File(
+                        execute(new SendVideo()
+                                .setVideo(new File(
                                         MeteoradarUtil.getPathToGifFile(
                                                 "http://www.meteoinfo.by/radar/UMMN/radar-map.gif")))
-//                                .setAnimation("http://www.meteoinfo.by/radar/UMMN/radar-map.gif")
                                 .setChatId(message.getChatId().toString()));
                     } catch (TelegramApiException e) {
                         sendMsg(message, "что-то пошло не так");

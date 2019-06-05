@@ -8,6 +8,9 @@ import util.YandexTranslateUtil;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class BoredApi {
     private final String urlPath = "https://www.boredapi.com/api/activity";
@@ -31,7 +34,11 @@ public class BoredApi {
 //        bored.setActivity(activity);
         bored.setParticipants(participants);
 
-        return "Мероприятие: " + bored.getActivity() + "\n"
+        //преобразование в UTF-8 (некорректная кодировка при запуске jar)
+        ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(bored.getActivity());
+        String activityInRussian = StandardCharsets.UTF_8.decode(byteBuffer).toString();
+
+        return "Мероприятие: " + activityInRussian + "\n"
                 + "Activity:  " + activity + "\n"
                 + "Количество участников: " + bored.getParticipants();
     }
