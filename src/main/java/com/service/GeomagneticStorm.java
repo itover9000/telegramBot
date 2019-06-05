@@ -1,9 +1,10 @@
-package service;
+package com.service;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import model.GeomagneticStormModel;
-import util.ReadJSONUtil;
+import com.model.GeomagneticStormModel;
+import org.springframework.stereotype.Service;
+import com.util.ReadJSONUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+@Service
 public class GeomagneticStorm {
 
     private static String parseGeomagneticStorm(String dateForParse) {

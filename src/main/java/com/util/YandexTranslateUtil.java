@@ -1,11 +1,14 @@
-package util;
+package com.util;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+@Service
 public class YandexTranslateUtil {
      private static final String key = "key=trnsl.1.1.20190511T083532Z.659a23627272fcf1.ab2b6c844422017a936d29c902783ebb3659700a";
      private static final String url ="https://translate.yandex.net/api/v1.5/tr.json/translate?";

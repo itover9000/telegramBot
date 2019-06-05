@@ -1,10 +1,13 @@
-import model.BoredModel;
-import model.CurrencyModel;
-import model.GeomagneticStormModel;
-import model.WeatherModel;
-import org.telegram.telegrambots.ApiContextInitializer;
+package com.bot;
+
+import com.model.BoredModel;
+import com.model.CurrencyModel;
+import com.model.GeomagneticStormModel;
+import com.model.WeatherModel;
+import com.settings.ApplicationSetting;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
@@ -14,51 +17,71 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
-import service.BoredApi;
-import service.Currency;
-import service.GeomagneticStorm;
-import service.Weather;
-import util.GeomagneticStormUtil;
-import util.MeteoradarUtil;
+import com.service.BoredApi;
+import com.service.Currency;
+import com.service.GeomagneticStorm;
+import com.service.Weather;
+import com.util.MeteoradarUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
+//@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class Bot extends TelegramLongPollingBot {
 
-    public static void main(String[] args) {
-        ApiContextInitializer.init();
-        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-        try {
-            telegramBotsApi.registerBot(new Bot());
-        } catch (TelegramApiRequestException e) {
-            e.printStackTrace();
-        }
+    @Autowired
+    private ApplicationSetting setting;
+    private final WeatherModel weatherModel;
+    private final CurrencyModel currencyModel;
+    private final BoredModel boredModel;
+    private final GeomagneticStormModel stormModel;
+    private final GeomagneticStorm geomagneticStorm;
+    private final BoredApi boredApi;
+    private final Currency currency;
 
-        //проверка бури с индексом > 4 каждые 3 часа и отправка ссобщения на эл. почту
-        GeomagneticStormUtil.checkStormEvery3Hour(new GeomagneticStormModel());
-
-
+    @Autowired
+    public Bot(WeatherModel weatherModel, CurrencyModel currencyModel, BoredModel boredModel, GeomagneticStormModel stormModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency) {
+        this.weatherModel = weatherModel;
+        this.currencyModel = currencyModel;
+        this.boredModel = boredModel;
+        this.stormModel = stormModel;
+        this.geomagneticStorm = geomagneticStorm;
+        this.boredApi = boredApi;
+        this.currency = currency;
     }
 
+//    public static void main(String[] args) {
+//        ApiContextInitializer.init();
+//        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
+//        try {
+//            telegramBotsApi.registerBot(new Bot());
+//        } catch (TelegramApiRequestException e) {
+//            e.printStackTrace();
+//        }
+//
+//        //проверка бури с индексом > 4 каждые 3 часа и отправка ссобщения на эл. почту
+//        GeomagneticStormUtil.checkStormEvery3Hour(new GeomagneticStormModel());
+//
+//
+//    }
+
     public void onUpdateReceived(Update update) {
-        WeatherModel weatherModel = new WeatherModel();
-        CurrencyModel currencyModel = new CurrencyModel();
-        BoredModel boredModel = new BoredModel();
-        GeomagneticStormModel stormModel = new GeomagneticStormModel();
+//        WeatherModel weatherModel = new WeatherModel();
+//        CurrencyModel currencyModel = new CurrencyModel();
+//        BoredModel boredModel = new BoredModel();
+//        GeomagneticStormModel stormModel = new GeomagneticStormModel();
         Message message = update.getMessage();
-        GeomagneticStorm geomagneticStorm = new GeomagneticStorm();
-        BoredApi boredApi = null;
-        try {
-            boredApi = new BoredApi();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+//        GeomagneticStorm geomagneticStorm = new GeomagneticStorm();
+//        BoredApi boredApi = null;
+//        try {
+//            boredApi = new BoredApi();
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
 
         if (message != null && message.hasText()) {
             switch (message.getText().toLowerCase().trim()) {
@@ -80,7 +103,7 @@ public class Bot extends TelegramLongPollingBot {
                                 .setChatId(message.getChatId().toString()));
 
                         //сообщение о времени картинки
-                        sendMsg(message, "состояние на " +  MeteoradarUtil.getTimeFromSite());
+                        sendMsg(message, "состояние на " + MeteoradarUtil.getTimeFromSite());
                     } catch (TelegramApiException | IOException | ParseException e) {
                         sendMsg(message, "что-то пошло не так");
                     }
@@ -90,9 +113,9 @@ public class Bot extends TelegramLongPollingBot {
                     try {
                         //пересылаю анимацию о погоде за последние 3 часа
                         //Качественная гифка только если отправлять через SendVideo
-                       /* Если передавать .setAnimation("http://www.meteoinfo.by/radar/UMMN/radar-map.gif")
-                       * то приходит гифка за 2017 год ????
-                       * поэтому такой костыль*/
+                        /* Если передавать .setAnimation("http://www.meteoinfo.by/radar/UMMN/radar-map.gif")
+                         * то приходит гифка за 2017 год ????
+                         * поэтому такой костыль*/
 
                         execute(new SendVideo()
                                 .setVideo(new File(
@@ -114,7 +137,7 @@ public class Bot extends TelegramLongPollingBot {
                     break;
                 case "курс валют":
                     try {
-                        sendMsg(message, Currency.getCurrency(currencyModel));
+                        sendMsg(message, currency.getCurrency(currencyModel));
                     } catch (IOException e) {
                         sendMsg(message, "неизвестная ошибка");
                     }
@@ -171,10 +194,10 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public String getBotUsername() {
-        return "itover9000_bot";
+        return setting.getUsername();
     }
 
     public String getBotToken() {
-        return "884639123:AAGJUFOWF9hoyk4_qM7vNw3YFYHXpsxVAMA";
+        return setting.getToken();
     }
 }

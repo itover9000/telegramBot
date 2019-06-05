@@ -1,9 +1,9 @@
-package model;
+package com.model;
 
 import lombok.Data;
+import org.springframework.stereotype.Service;
 
-import java.util.Date;
-
+@Service
 @Data
 public class CurrencyModel {
     private String date;

@@ -1,9 +1,10 @@
-package util;
+package com.util;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+
+@Service
 public class MeteoradarUtil {
     private static final String link = "http://www.meteoinfo.by/radar/?q=UMMN&t=0";
     private static String title;

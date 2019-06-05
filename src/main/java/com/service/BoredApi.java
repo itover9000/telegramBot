@@ -1,9 +1,10 @@
-package service;
+package com.service;
 
-import model.BoredModel;
+import com.model.BoredModel;
 import org.json.JSONObject;
-import util.ReadJSONUtil;
-import util.YandexTranslateUtil;
+import org.springframework.stereotype.Service;
+import com.util.ReadJSONUtil;
+import com.util.YandexTranslateUtil;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -12,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+@Service
 public class BoredApi {
     private final String urlPath = "https://www.boredapi.com/api/activity";
     private URL url = new URL(urlPath);

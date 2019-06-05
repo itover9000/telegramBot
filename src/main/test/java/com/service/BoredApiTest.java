@@ -1,11 +1,7 @@
-package service;
+package com.service;
 
-import model.BoredModel;
-import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
+import com.model.BoredModel;
 import org.junit.Test;
-import util.ReadJSONUtil;
 
 import java.io.IOException;
 import java.net.URL;

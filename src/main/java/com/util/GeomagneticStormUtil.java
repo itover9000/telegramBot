@@ -1,10 +1,11 @@
-package util;
+package com.util;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import model.GeomagneticStormModel;
-import service.GeomagneticStorm;
-import service.Sender;
+import com.model.GeomagneticStormModel;
+import org.springframework.stereotype.Service;
+import com.service.GeomagneticStorm;
+import com.service.Sender;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -15,6 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Service
 public class GeomagneticStormUtil {
     private static GeomagneticStorm geomagneticStorm = new GeomagneticStorm();
     private static Sender sender = new Sender("h.dabravolskay@yandex.ru", "tratata88");

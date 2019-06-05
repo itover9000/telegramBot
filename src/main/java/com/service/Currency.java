@@ -1,8 +1,9 @@
-package service;
+package com.service;
 
-import model.CurrencyModel;
+import com.model.CurrencyModel;
 import org.json.JSONObject;
-import util.ReadJSONUtil;
+import org.springframework.stereotype.Service;
+import com.util.ReadJSONUtil;
 
 import java.io.IOException;
 import java.net.URL;
@@ -11,9 +12,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class Currency {
 
-    public static String getCurrency(CurrencyModel currencyModel) throws IOException {
+    public String getCurrency(CurrencyModel currencyModel) throws IOException {
         List<Integer> currencyList = new ArrayList<Integer>() {{
             add(145);
             add(292);

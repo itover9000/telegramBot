@@ -1,4 +1,7 @@
-package service;
+package com.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Properties;
 
@@ -12,6 +15,7 @@ public class Sender {
     private String password;
     private Properties props;
 
+//    @Autowired
     public Sender(String username, String password) {
         this.username = username;
         this.password = password;

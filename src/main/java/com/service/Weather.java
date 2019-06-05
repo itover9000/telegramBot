@@ -1,13 +1,15 @@
-package service;
+package com.service;
 
-import model.WeatherModel;
+import com.model.WeatherModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import util.ReadJSONUtil;
+import org.springframework.stereotype.Service;
+import com.util.ReadJSONUtil;
 
 import java.io.IOException;
 import java.net.URL;
 
+@Service
 public class Weather {
     // 6621cca782054fa6e402deac83420b10
     public static String getWeather(String message, WeatherModel weatherModel) throws IOException {
