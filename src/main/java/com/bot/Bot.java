@@ -33,8 +33,7 @@ import java.util.List;
 //@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class Bot extends TelegramLongPollingBot {
 
-    @Autowired
-    private ApplicationSetting setting;
+    private final ApplicationSetting setting;
     private final WeatherModel weatherModel;
     private final CurrencyModel currencyModel;
     private final BoredModel boredModel;
@@ -44,7 +43,7 @@ public class Bot extends TelegramLongPollingBot {
     private final Currency currency;
 
     @Autowired
-    public Bot(WeatherModel weatherModel, CurrencyModel currencyModel, BoredModel boredModel, GeomagneticStormModel stormModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency) {
+    public Bot(WeatherModel weatherModel, CurrencyModel currencyModel, BoredModel boredModel, GeomagneticStormModel stormModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency, ApplicationSetting setting) {
         this.weatherModel = weatherModel;
         this.currencyModel = currencyModel;
         this.boredModel = boredModel;
@@ -52,36 +51,12 @@ public class Bot extends TelegramLongPollingBot {
         this.geomagneticStorm = geomagneticStorm;
         this.boredApi = boredApi;
         this.currency = currency;
+        this.setting = setting;
     }
 
-//    public static void main(String[] args) {
-//        ApiContextInitializer.init();
-//        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-//        try {
-//            telegramBotsApi.registerBot(new Bot());
-//        } catch (TelegramApiRequestException e) {
-//            e.printStackTrace();
-//        }
-//
-//        //проверка бури с индексом > 4 каждые 3 часа и отправка ссобщения на эл. почту
-//        GeomagneticStormUtil.checkStormEvery3Hour(new GeomagneticStormModel());
-//
-//
-//    }
 
     public void onUpdateReceived(Update update) {
-//        WeatherModel weatherModel = new WeatherModel();
-//        CurrencyModel currencyModel = new CurrencyModel();
-//        BoredModel boredModel = new BoredModel();
-//        GeomagneticStormModel stormModel = new GeomagneticStormModel();
         Message message = update.getMessage();
-//        GeomagneticStorm geomagneticStorm = new GeomagneticStorm();
-//        BoredApi boredApi = null;
-//        try {
-//            boredApi = new BoredApi();
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
 
         if (message != null && message.hasText()) {
             switch (message.getText().toLowerCase().trim()) {

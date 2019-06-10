@@ -3,6 +3,7 @@ package com.util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.model.GeomagneticStormModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.service.GeomagneticStorm;
 import com.service.Sender;
@@ -18,7 +19,10 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class GeomagneticStormUtil {
-    private static GeomagneticStorm geomagneticStorm = new GeomagneticStorm();
+
+    @Autowired
+    private static GeomagneticStorm geomagneticStorm;
+
     private static Sender sender = new Sender("h.dabravolskay@yandex.ru", "tratata88");
     private static boolean startStorm;
 

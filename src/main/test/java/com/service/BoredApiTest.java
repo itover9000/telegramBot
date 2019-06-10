@@ -2,21 +2,31 @@ package com.service;
 
 import com.model.BoredModel;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.net.URL;
 
 import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class BoredApiTest {
 
+    @Autowired
+    private BoredModel model;
+
+    @Autowired
+    private BoredApi boredApi;
 
     @Test
     public void getBoredStringFormat() throws IOException {
-        BoredModel model = new BoredModel();
 
         URL urlResource = ClassLoader.getSystemResource("bored.json");
-        BoredApi boredApi = new BoredApi(urlResource);
+        boredApi = new BoredApi(urlResource);
 
         //прочитали json из ресурсов, достали название мероприятия, количество участников и перевели
         String boredStringFormat = boredApi.getBoredStringFormat(model);
