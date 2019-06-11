@@ -33,6 +33,8 @@ import java.util.List;
 //@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class Bot extends TelegramLongPollingBot {
 
+    private final MeteoradarUtil meteoradarUtil;
+
     private final ApplicationSetting setting;
     private final WeatherModel weatherModel;
     private final CurrencyModel currencyModel;
@@ -43,7 +45,7 @@ public class Bot extends TelegramLongPollingBot {
     private final Currency currency;
 
     @Autowired
-    public Bot(WeatherModel weatherModel, CurrencyModel currencyModel, BoredModel boredModel, GeomagneticStormModel stormModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency, ApplicationSetting setting) {
+    public Bot(WeatherModel weatherModel, CurrencyModel currencyModel, BoredModel boredModel, GeomagneticStormModel stormModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency, ApplicationSetting setting, MeteoradarUtil meteoradarUtil) {
         this.weatherModel = weatherModel;
         this.currencyModel = currencyModel;
         this.boredModel = boredModel;
@@ -52,6 +54,7 @@ public class Bot extends TelegramLongPollingBot {
         this.boredApi = boredApi;
         this.currency = currency;
         this.setting = setting;
+        this.meteoradarUtil = meteoradarUtil;
     }
 
 
@@ -74,11 +77,11 @@ public class Bot extends TelegramLongPollingBot {
                     try {
                         //пересылаю картинку с сайта
                         execute(new SendPhoto()
-                                .setPhoto(MeteoradarUtil.getImageFromUrl())
+                                .setPhoto(meteoradarUtil.getImageFromUrl())
                                 .setChatId(message.getChatId().toString()));
 
                         //сообщение о времени картинки
-                        sendMsg(message, "состояние на " + MeteoradarUtil.getTimeFromSite());
+                        sendMsg(message, "погода " + meteoradarUtil.getTimeFromSite());
                     } catch (TelegramApiException | IOException | ParseException e) {
                         sendMsg(message, "что-то пошло не так");
                     }
@@ -94,7 +97,7 @@ public class Bot extends TelegramLongPollingBot {
 
                         execute(new SendVideo()
                                 .setVideo(new File(
-                                        MeteoradarUtil.getPathToGifFile(
+                                        meteoradarUtil.getPathToGifFile(
                                                 "http://www.meteoinfo.by/radar/UMMN/radar-map.gif")))
                                 .setChatId(message.getChatId().toString()));
                     } catch (TelegramApiException e) {
