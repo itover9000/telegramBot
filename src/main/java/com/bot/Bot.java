@@ -4,7 +4,12 @@ import com.model.BoredModel;
 import com.model.CurrencyModel;
 import com.model.GeomagneticStormModel;
 import com.model.WeatherModel;
+import com.service.BoredApi;
+import com.service.Currency;
+import com.service.GeomagneticStorm;
+import com.service.Weather;
 import com.settings.ApplicationSetting;
+import com.util.MeteoradarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -17,11 +22,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import com.service.BoredApi;
-import com.service.Currency;
-import com.service.GeomagneticStorm;
-import com.service.Weather;
-import com.util.MeteoradarUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +57,6 @@ public class Bot extends TelegramLongPollingBot {
         this.meteoradarUtil = meteoradarUtil;
     }
 
-
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
 
@@ -69,21 +68,23 @@ public class Bot extends TelegramLongPollingBot {
 
                     } catch (IOException e) {
                         sendMsg(message, "что-то пошло не так");
-                        System.out.println(e.toString());
+                        e.printStackTrace();
                     }
                     break;
 
                 case "текущая погода":
                     try {
                         //пересылаю картинку с сайта
+                        //предварительно помечаю место на карте
                         execute(new SendPhoto()
-                                .setPhoto(meteoradarUtil.getImageFromUrl())
+                                .setPhoto(new File(meteoradarUtil.getMapWithVillage("radar-map.png")))
                                 .setChatId(message.getChatId().toString()));
 
                         //сообщение о времени картинки
-                        sendMsg(message, "погода " + meteoradarUtil.getTimeFromSite());
+                        sendMsg(message, "погода " + meteoradarUtil.getTimeFromSiteWithNewTime(meteoradarUtil.getTitle()));
                     } catch (TelegramApiException | IOException | ParseException e) {
                         sendMsg(message, "что-то пошло не так");
+                        e.printStackTrace();
                     }
                     break;
 
@@ -97,8 +98,8 @@ public class Bot extends TelegramLongPollingBot {
 
                         execute(new SendVideo()
                                 .setVideo(new File(
-                                        meteoradarUtil.getPathToGifFile(
-                                                "http://www.meteoinfo.by/radar/UMMN/radar-map.gif")))
+                                        meteoradarUtil.getPathToFileInRootProject(
+                                                "http://www.meteoinfo.by/radar/UMMN/radar-map.gif", "radar-map.gif")))
                                 .setChatId(message.getChatId().toString()));
                     } catch (TelegramApiException e) {
                         sendMsg(message, "что-то пошло не так");
@@ -111,13 +112,15 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, boredApi.getBoredStringFormat(boredModel));
                     } catch (IOException e) {
                         sendMsg(message, "что-то пошло не так");
+                        e.printStackTrace();
                     }
                     break;
                 case "курс валют":
                     try {
                         sendMsg(message, currency.getCurrency(currencyModel));
                     } catch (IOException e) {
-                        sendMsg(message, "неизвестная ошибка");
+                        sendMsg(message, "что-то пошло не так");
+                        e.printStackTrace();
                     }
                     break;
 

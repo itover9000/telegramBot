@@ -67,7 +67,7 @@ public class MeteoradarUtilTest {
         int responseCodeImage = urlToImagePng.getResponseCode();
         assertEquals(responseCodeImage, 200);
 
-        String pathToGifFile = meteoradarUtil.getPathToGifFile("http://www.meteoinfo.by/radar/UMMN/radar-map.gif");
+        String pathToGifFile = meteoradarUtil.getPathToFileInRootProject("http://www.meteoinfo.by/radar/UMMN/radar-map.gif", "radar-map.gif");
         File file = new File(pathToGifFile);
         assertTrue(file.exists());
         assertEquals(pathToGifFile, "radar-map.gif");

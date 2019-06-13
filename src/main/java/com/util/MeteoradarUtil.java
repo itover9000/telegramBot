@@ -1,6 +1,5 @@
 package com.util;
 
-import org.apache.http.client.utils.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,9 +31,18 @@ public class MeteoradarUtil {
     private final String link = "http://www.meteoinfo.by/radar/?q=UMMN&t=0";
     private String title;
 
+    private final DrawVillageOnMap drawVillageOnMap;
+
     @Autowired
-    public MeteoradarUtil(Time24HoursValidator validator) {
+    public MeteoradarUtil(Time24HoursValidator validator, DrawVillageOnMap drawVillageOnMap) {
         this.validator = validator;
+        this.drawVillageOnMap = drawVillageOnMap;
+    }
+
+    public String getMapWithVillage(String fileName) throws IOException {
+        String mapInRootProject = getPathToFileInRootProject(getImageFromUrl(), fileName);
+        drawVillageOnMap.mapWithVillage(mapInRootProject);
+        return fileName;
     }
 
     public String getImageFromUrl() throws IOException {
@@ -49,14 +57,6 @@ public class MeteoradarUtil {
     }
 
 
-    public String getTimeFromSite() throws ParseException {
-        try {
-            getImageFromUrl();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return getTimeFromSiteWithNewTime(title);
-    }
 
     public String getTimeFromSiteWithNewTime(String title) throws ParseException {
         if (title != null && !title.isEmpty()) {
@@ -67,20 +67,6 @@ public class MeteoradarUtil {
             String validDate = parseTitleForGettingDate(title);
 
             if (validTime != null && !validTime.isEmpty() && validDate != null && !validDate.isEmpty()) {
-                /*//устанавливаем часовой пояс
-                SimpleDateFormat customFormat = new SimpleDateFormat("HH:mm");
-                customFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                //получили дату с новым часовым поясом
-                Date date = customFormat.parse(validTime);
-
-                //вывод времени в формате HH:mm в корректном виде (раньше  16:00 выводило как 16:0, теперь корректно)
-                return new SimpleDateFormat("HH:mm").format(date);*/
-//
-//                //получаем время в формате "HH:mm"
-//                String timeHHmm = parseTitleForGettingTime(title);
-//
-//                //получаем дату в формате dd.MM
-//                String dateddMM = parseTitleForGettingDate(title);
 
                 //получаем текущий год
                 Calendar calendar = Calendar.getInstance();   // Gets the current date and time
@@ -183,8 +169,8 @@ public class MeteoradarUtil {
         return resultDate;
     }
 
-    public String getPathToGifFile(String urlForDownloadGif) throws IOException {
-        File file = new File("radar-map.gif");
+    public String getPathToFileInRootProject(String urlForDownloadGif, String fileName) throws IOException {
+        File file = new File(fileName);
         URL website = new URL(urlForDownloadGif);
 
         if (!file.exists()) {
