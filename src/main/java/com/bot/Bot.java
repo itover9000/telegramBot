@@ -1,5 +1,6 @@
 package com.bot;
 
+import com.exception.InvalidURLException;
 import com.model.BoredModel;
 import com.model.CurrencyModel;
 import com.model.GeomagneticStormModel;
@@ -84,6 +85,9 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, "погода " + meteoradarUtil.getTimeFromSiteWithNewTime(meteoradarUtil.getTitle()));
                     } catch (TelegramApiException | IOException | ParseException e) {
                         sendMsg(message, "что-то пошло не так");
+                        e.printStackTrace();
+                    } catch (InvalidURLException e) {
+                        sendMsg(message, "Сайт не предоставил данные");
                         e.printStackTrace();
                     }
                     break;

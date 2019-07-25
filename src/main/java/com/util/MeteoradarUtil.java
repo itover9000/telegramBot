@@ -1,5 +1,7 @@
 package com.util;
 
+import com.exception.InvalidURLException;
+import org.apache.commons.validator.UrlValidator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,13 +41,13 @@ public class MeteoradarUtil {
         this.drawVillageOnMap = drawVillageOnMap;
     }
 
-    public String getMapWithVillage(String fileName) throws IOException {
+    public String getMapWithVillage(String fileName) throws IOException, InvalidURLException {
         String mapInRootProject = getPathToFileInRootProject(getImageFromUrl(), fileName);
         drawVillageOnMap.mapWithVillage(mapInRootProject);
         return fileName;
     }
 
-    public String getImageFromUrl() throws IOException {
+    public String getImageFromUrl() throws IOException, InvalidURLException {
         Document doc = Jsoup.connect(link).get();
         Element table = doc.select("table").get(2); //select the third table.
         Elements rows = table.select("tr");
@@ -53,9 +55,15 @@ public class MeteoradarUtil {
         title = rows.get(0).getElementsByTag("img").get(0).attr("title");
         //select absolute path from table
         String url = rows.get(0).getElementsByTag("img").get(0).absUrl("src");
-        return url;
-    }
 
+        //Проверяем полученный url на валидность, если что - кидаем исключение
+        String[] schemes = {"http","https"};
+        UrlValidator urlValidator = new UrlValidator(schemes);
+
+        if (url == null || url.isEmpty() || !urlValidator.isValid(url)) {
+            throw new InvalidURLException("Invalid URL");
+        } else return url;
+    }
 
 
     public String getTimeFromSiteWithNewTime(String title) throws ParseException {
