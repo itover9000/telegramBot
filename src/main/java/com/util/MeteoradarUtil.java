@@ -1,6 +1,7 @@
 package com.util;
 
 import com.exception.InvalidURLException;
+import com.exception.NoDataOnTheSiteException;
 import org.apache.commons.validator.UrlValidator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -41,15 +42,19 @@ public class MeteoradarUtil {
         this.drawVillageOnMap = drawVillageOnMap;
     }
 
-    public String getMapWithVillage(String fileName) throws IOException, InvalidURLException {
+    public String getMapWithVillage(String fileName) throws IOException, InvalidURLException, NoDataOnTheSiteException {
         String mapInRootProject = getPathToFileInRootProject(getImageFromUrl(), fileName);
         drawVillageOnMap.mapWithVillage(mapInRootProject);
         return fileName;
     }
 
-    public String getImageFromUrl() throws IOException, InvalidURLException {
+    public String getImageFromUrl() throws IOException, InvalidURLException, NoDataOnTheSiteException {
         Document doc = Jsoup.connect(link).get();
-        Element table = doc.select("table").get(2); //select the third table.
+        Element table = null;
+        //проверка на существование таблицы
+        if (!doc.select("table").isEmpty() && ((doc.select("table").size() >= 3))) {
+            table = doc.select("table").get(2); //select the third table.
+        } else throw new NoDataOnTheSiteException("Invalid URL");
         Elements rows = table.select("tr");
 
         title = rows.get(0).getElementsByTag("img").get(0).attr("title");
@@ -57,7 +62,7 @@ public class MeteoradarUtil {
         String url = rows.get(0).getElementsByTag("img").get(0).absUrl("src");
 
         //Проверяем полученный url на валидность, если что - кидаем исключение
-        String[] schemes = {"http","https"};
+        String[] schemes = {"http", "https"};
         UrlValidator urlValidator = new UrlValidator(schemes);
 
         if (url == null || url.isEmpty() || !urlValidator.isValid(url)) {

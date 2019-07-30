@@ -1,6 +1,7 @@
 package com.util;
 
 import com.exception.InvalidURLException;
+import com.exception.NoDataOnTheSiteException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class MeteoradarUtilTest {
     private MeteoradarUtil meteoradarUtil;
 
     @Test
-    public void getImageFromUrl() throws IOException, InvalidURLException {
+    public void getImageFromUrl() throws IOException, InvalidURLException, NoDataOnTheSiteException {
         //http://www.meteoinfo.by/radar/UMMN/UMMN_1559557200.png
         String link = meteoradarUtil.getLink();
 

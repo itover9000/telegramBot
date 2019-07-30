@@ -1,6 +1,7 @@
 package com.bot;
 
 import com.exception.InvalidURLException;
+import com.exception.NoDataOnTheSiteException;
 import com.model.BoredModel;
 import com.model.CurrencyModel;
 import com.model.GeomagneticStormModel;
@@ -86,7 +87,7 @@ public class Bot extends TelegramLongPollingBot {
                     } catch (TelegramApiException | IOException | ParseException e) {
                         sendMsg(message, "что-то пошло не так");
                         e.printStackTrace();
-                    } catch (InvalidURLException e) {
+                    } catch (InvalidURLException | NoDataOnTheSiteException e) {
                         sendMsg(message, "Сайт не предоставил данные");
                         e.printStackTrace();
                     }
