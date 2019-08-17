@@ -1,7 +1,9 @@
 package com.util;
 
-import com.exception.InvalidURLException;
+import com.enums.TimeEnum;
+import com.exception.InvalidUrlException;
 import com.exception.NoDataOnTheSiteException;
+import com.settings.UrlSetting;
 import org.apache.commons.validator.UrlValidator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,10 +31,13 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class MeteoradarUtil {
 
-    private final Time24HoursValidator validator;
+    @Autowired
+    private UrlSetting urlSetting;
 
-    private final String link = "http://www.meteoinfo.by/radar/?q=UMMN&t=0";
+    private final Time24HoursValidator validator;
     private String title;
+    private static final String TABLE = "table";
+    private static final String EXCEPTION_MESSAGE = "Invalid URL";
 
     private final DrawVillageOnMap drawVillageOnMap;
 
@@ -42,32 +47,32 @@ public class MeteoradarUtil {
         this.drawVillageOnMap = drawVillageOnMap;
     }
 
-    public String getMapWithVillage(String fileName) throws IOException, InvalidURLException, NoDataOnTheSiteException {
+    public String getMapWithVillage(String fileName) throws IOException, InvalidUrlException, NoDataOnTheSiteException {
         String mapInRootProject = getPathToFileInRootProject(getImageFromUrl(), fileName);
         drawVillageOnMap.mapWithVillage(mapInRootProject);
         return fileName;
     }
 
-    public String getImageFromUrl() throws IOException, InvalidURLException, NoDataOnTheSiteException {
-        Document doc = Jsoup.connect(link).get();
-        Element table;
+    public String getImageFromUrl() throws IOException, InvalidUrlException, NoDataOnTheSiteException {
+        Document doc = Jsoup.connect(urlSetting.getUrlMainPageMeteoinfo()).get();
+        Element tableElement;
 
-        //проверка на существование таблицы
-        if (!doc.select("table").isEmpty() && doc.select("table").size() >= 3) {
-            table = doc.select("table").get(2); //select the third table.
-        } else throw new NoDataOnTheSiteException("Invalid URL");
-        Elements rows = table.select("tr");
+        //table existence check
+        if (!doc.select(TABLE).isEmpty() && doc.select(TABLE).size() >= 3) {
+            tableElement = doc.select(TABLE).get(2); //select the third TABLE.
+        } else throw new NoDataOnTheSiteException(EXCEPTION_MESSAGE);
+        Elements rows = tableElement.select("tr");
 
         title = rows.get(0).getElementsByTag("img").get(0).attr("title");
-        //select absolute path from table
+        //select absolute path from TABLE
         String url = rows.get(0).getElementsByTag("img").get(0).absUrl("src");
 
-        //Проверяем полученный url на валидность, если что - кидаем исключение
+        //Check the received url for validity, if that - we throw an exception
         String[] schemes = {"http", "https"};
         UrlValidator urlValidator = new UrlValidator(schemes);
 
         if (url == null || url.isEmpty() || !urlValidator.isValid(url)) {
-            throw new InvalidURLException("Invalid URL");
+            throw new InvalidUrlException(EXCEPTION_MESSAGE);
         } else return url;
     }
 
@@ -77,21 +82,21 @@ public class MeteoradarUtil {
             //get time in the format "HH:mm"  16:35
             String validTime = parseTitleForGettingTime(title);
 
-            //получаем дату в формате dd.MM 13.06
+            //get date in the format dd.MM 13.06
             String validDate = parseTitleForGettingDate(title);
 
             if (validTime != null && !validTime.isEmpty() && validDate != null && !validDate.isEmpty()) {
 
-                //получаем текущий год
+                //get current year
                 Calendar calendar = Calendar.getInstance();   // Gets the current date and time
                 int year = calendar.get(Calendar.YEAR);       // The current year
 
-                //устанавливаем формат времени
+                //set the format time
                 SimpleDateFormat format = new SimpleDateFormat("HH:mm dd.MM.yyyy");
-                //устанавливаем часовой пояс
+                //set the time zone
                 format.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-                //парсим входящее время в формате "HH:mm dd.MM.yyyy"
+                //parse incoming time in format "HH:mm dd.MM.yyyy"
                 Date past = format.parse(validTime + " " + validDate + "." + year);
 
                 Date now = new Date();
@@ -99,7 +104,7 @@ public class MeteoradarUtil {
                 PrettyTime prettyTime = new PrettyTime(now, new Locale("ru"));
                 String prettyFormat = prettyTime.format(past);
 
-                //считаем разницу между текущей датой и полученной из title
+                //consider the difference between the current date and the one obtained from title
                 long minutes = TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());
                 long hours = TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime());
 
@@ -109,11 +114,11 @@ public class MeteoradarUtil {
         return "неверный формат";
     }
 
-    //делаю чтобы было корректное окончание минут\минуты\минута час\часа\часов
+    //make sure that there is a correct ending минут\минуты\минута час\часа\часов
     public String correctEndingInTime(long hours, long minutes, String prettyFormat) {
 
         if (hours == 0 && minutes >= 0) {
-            //сейчас или 15 минут назад
+            //now or 15 minutes ago
             return prettyFormat;
         }
 
@@ -121,11 +126,11 @@ public class MeteoradarUtil {
             if (minutes % 60 == 0) {
                 return prettyFormat;
             } else if (minutes % 60 == 1) {
-                return hours + " час " + minutes % 60 + " минуту назад";
+                return hours + TimeEnum.HOUR.getTranslation() + minutes % 60 + TimeEnum.MINUTE.getTranslation();
             } else if (minutes % 60 >= 2 && minutes % 60 <= 4) {
-                return hours + " час " + minutes % 60 + " минуты назад";
+                return hours + TimeEnum.HOUR.getTranslation() + minutes % 60 +TimeEnum.MINUTES_OTHER.getTranslation();
             } else {
-                return hours + " час " + minutes % 60 + " минут назад";
+                return hours + TimeEnum.HOUR.getTranslation() + minutes % 60 + TimeEnum.MINUTES.getTranslation();
             }
         }
 
@@ -133,11 +138,11 @@ public class MeteoradarUtil {
             if (minutes % 60 == 0) {
                 return prettyFormat;
             } else if (minutes % 60 == 1) {
-                return hours + " часа " + minutes % 60 + " минуту назад";
+                return hours + TimeEnum.HOURS_OTHER.getTranslation() + minutes % 60 + TimeEnum.MINUTE.getTranslation();
             } else if (minutes % 60 >= 2 && minutes % 60 <= 4) {
-                return hours + " часа " + minutes % 60 + " минуты назад";
+                return hours + TimeEnum.HOURS_OTHER.getTranslation() + minutes % 60 + TimeEnum.MINUTES_OTHER.getTranslation();
             } else {
-                return hours + " часа " + minutes % 60 + " минут назад";
+                return hours + TimeEnum.HOURS_OTHER.getTranslation() + minutes % 60 + TimeEnum.MINUTES.getTranslation();
             }
         }
 
@@ -145,11 +150,11 @@ public class MeteoradarUtil {
             if (minutes % 60 == 0) {
                 return prettyFormat;
             } else if (minutes % 60 == 1) {
-                return hours + " часов " + minutes % 60 + " минуту назад";
+                return hours + TimeEnum.HOURS.getTranslation() + minutes % 60 + TimeEnum.MINUTE.getTranslation();
             } else if (minutes % 60 >= 2 && minutes % 60 <= 4) {
-                return hours + " часов " + minutes % 60 + " минуты назад";
+                return hours + TimeEnum.HOURS.getTranslation() + minutes % 60 + TimeEnum.MINUTES_OTHER.getTranslation();
             } else {
-                return hours + " часов " + minutes % 60 + " минут назад";
+                return hours + TimeEnum.HOURS.getTranslation() + minutes % 60 + TimeEnum.MINUTES.getTranslation();
             }
         }
 
@@ -170,7 +175,7 @@ public class MeteoradarUtil {
     }
 
     public String parseTitleForGettingDate(String text) {
-        //возвращаем из текста дату в формате dd.mm
+        //return the date from the text in the format dd.mm
         String resultDate = "";
         String[] splitText = text.split(" ");
         for (String time : splitText) {
@@ -182,18 +187,18 @@ public class MeteoradarUtil {
         return resultDate;
     }
 
-    public String getPathToFileInRootProject(String urlForDownloadGif, String fileName) throws IOException, InvalidURLException {
+    public String getPathToFileInRootProject(String urlForDownloadGif, String fileName) throws IOException, InvalidUrlException {
         File file = new File(fileName);
         URL website = new URL(urlForDownloadGif);
 
         if (!file.exists()) {
-            //если файла не существует, то качаем и копируем в корень проекта
+            //if the file does not exist, then download and copy to the root of the project
             copyGifToRootProject(file, website);
         } else {
             long contentLengthGif = website.openConnection().getContentLengthLong();
-            //если файл отличается по размеру, то заменяем на новый файл
+            //if the file is different in size, then replace with a new file
             if (contentLengthGif == -1) {
-                throw new InvalidURLException("Invalid URL");
+                throw new InvalidUrlException(EXCEPTION_MESSAGE);
             } else if (file.length() != contentLengthGif) {
                 copyGifToRootProject(file, website);
             }
@@ -207,10 +212,6 @@ public class MeteoradarUtil {
             //max size 5Mb
             fos.getChannel().transferFrom(rbc, 0, 5 * 1024 * 1024);
         }
-    }
-
-    public String getLink() {
-        return link;
     }
 
     public String getTitle() {

@@ -19,7 +19,7 @@ public class YandexTranslateUtilTest {
 
     @Test
     public void translateFromEnToRu() throws IOException {
-        String helloWorld = yandexTranslateUtil.translateFromEnToRu("Hello world");
+        String helloWorld = yandexTranslateUtil.translateFromEngToRu("Hello world");
         assertEquals("Привет мир", helloWorld);
     }
 }

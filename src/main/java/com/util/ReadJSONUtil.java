@@ -21,14 +21,14 @@ public class ReadJSONUtil {
         return new JSONObject(result);
     }
 
-    //return json in String format
+    //return json on String format
     public static String getJSONStringFormat(URL url) throws IOException {
         Scanner in = new Scanner((InputStream) url.getContent());
         StringBuilder result = new StringBuilder();
         while (in.hasNext()) {
             result.append(in.nextLine());
         }
-        return String.valueOf(result);
+        return result.toString();
 
     }
 }

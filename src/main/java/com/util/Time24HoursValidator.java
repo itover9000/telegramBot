@@ -15,9 +15,7 @@ public class Time24HoursValidator {
      # or [12][0-9]        10-19 or 20-29
      # or 3[01]            30 or 31 )
      # end group 1
-
      #  "."
-
      # start group 2
      # 0?[1-9]              01-09 or 1-9
      # or 1[012]           10,11 or 12

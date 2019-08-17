@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 @Service
 public class YandexTranslateUtil {
@@ -18,7 +17,7 @@ public class YandexTranslateUtil {
     @Autowired
     private YandexSettings yandexSettings;
 
-    public String translateFromEnToRu(String text) throws IOException {
+    public String translateFromEngToRu(String text) throws IOException {
 
         // replace all spaces with% 20 characters for the correct link
         String textWithSpacesReplaced = text.replace(" ", "%20");
@@ -44,12 +43,8 @@ public class YandexTranslateUtil {
 
         StringBuilder translate = new StringBuilder();
         if (yandexModel.getCode() == 200) {
-            for (String textFromModel : yandexModel.getText()) {
-                translate.append(textFromModel);
-            }
-
-            //set the encoding UTF_8 for correct display
-            return new String(String.valueOf(translate).getBytes(), StandardCharsets.UTF_8);
+            yandexModel.getText().forEach(translate::append);
+            return translate.toString();
         } else return "Не удалось получить данные";
     }
 

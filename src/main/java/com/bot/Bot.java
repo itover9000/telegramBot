@@ -1,15 +1,11 @@
 package com.bot;
 
-import com.exception.InvalidURLException;
+import com.exception.InvalidUrlException;
 import com.exception.NoDataOnTheSiteException;
 import com.model.BoredModel;
-import com.model.CurrencyModel;
-import com.model.GeomagneticStormModel;
-import com.model.WeatherModel;
 import com.service.BoredApi;
 import com.service.Currency;
 import com.service.GeomagneticStorm;
-import com.service.Weather;
 import com.settings.BotSetting;
 import com.settings.UrlSetting;
 import com.util.MeteoradarUtil;
@@ -38,10 +34,7 @@ public class Bot extends TelegramLongPollingBot {
     private final MeteoradarUtil meteoradarUtil;
 
     private final BotSetting botSetting;
-    private final WeatherModel weatherModel;
-    private final CurrencyModel currencyModel;
     private final BoredModel boredModel;
-    private final GeomagneticStormModel stormModel;
     private final GeomagneticStorm geomagneticStorm;
     private final BoredApi boredApi;
     private final Currency currency;
@@ -49,11 +42,9 @@ public class Bot extends TelegramLongPollingBot {
     private final UrlSetting urlSetting;
 
     @Autowired
-    public Bot(WeatherModel weatherModel, CurrencyModel currencyModel, BoredModel boredModel, GeomagneticStormModel stormModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency, BotSetting botSetting, MeteoradarUtil meteoradarUtil, UrlSetting urlSetting) {
-        this.weatherModel = weatherModel;
-        this.currencyModel = currencyModel;
+    public Bot(BoredModel boredModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi,
+               Currency currency, BotSetting botSetting, MeteoradarUtil meteoradarUtil, UrlSetting urlSetting) {
         this.boredModel = boredModel;
-        this.stormModel = stormModel;
         this.geomagneticStorm = geomagneticStorm;
         this.boredApi = boredApi;
         this.currency = currency;
@@ -90,7 +81,7 @@ public class Bot extends TelegramLongPollingBot {
                     } catch (TelegramApiException | IOException | ParseException e) {
                         sendMsg(message, "данные на сайте недоступны");
                         e.printStackTrace();
-                    } catch (InvalidURLException | NoDataOnTheSiteException e) {
+                    } catch (InvalidUrlException | NoDataOnTheSiteException e) {
                         sendMsg(message, "Сайт не предоставил данные");
                         e.printStackTrace();
                     }
@@ -106,7 +97,7 @@ public class Bot extends TelegramLongPollingBot {
                                 .setChatId(message.getChatId().toString()));
                     } catch (TelegramApiException e) {
                         sendMsg(message, "что-то пошло не так");
-                    } catch (IOException | InvalidURLException e) {
+                    } catch (IOException | InvalidUrlException e) {
                         sendMsg(message, "данные на сайте недоступны");
                         e.printStackTrace();
                     }
@@ -121,7 +112,7 @@ public class Bot extends TelegramLongPollingBot {
                     break;
                 case "курс валют":
                     try {
-                        sendMsg(message, currency.getCurrency(currencyModel));
+                        sendMsg(message, currency.getCurrency());
                     } catch (IOException e) {
                         sendMsg(message, "что-то пошло не так");
                         e.printStackTrace();
@@ -129,11 +120,8 @@ public class Bot extends TelegramLongPollingBot {
                     break;
 
                 default:
-                    try {
-                        sendMsg(message, Weather.getWeather(message.getText(), weatherModel));
-                    } catch (IOException e) {
-                        sendMsg(message, "такой город не найден");
-                    }
+                        sendMsg(message, ".");
+
             }
         }
     }

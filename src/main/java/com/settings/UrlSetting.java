@@ -12,4 +12,6 @@ public class UrlSetting {
     private String gifFileNameFromMeteoinfo;
     private String urlToBoredapi;
     private String urlToGeomagneticSite;
+    private String urlMainPageMeteoinfo;
+
 }

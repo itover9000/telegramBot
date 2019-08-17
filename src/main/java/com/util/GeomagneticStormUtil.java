@@ -1,6 +1,8 @@
 package com.util;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.model.GeomagneticStormModel;
 import com.service.GeomagneticStorm;
@@ -20,26 +22,26 @@ import java.util.List;
 @Service
 public class GeomagneticStormUtil {
 
-    private final GeomagneticStorm geomagneticStorm;
-
-    private final EmailSetting emailSetting;
-
-    private final GeomagneticStormModel stormModel;
+    @Autowired
+    private EmailSetting emailSetting;
 
     @Autowired
     private UrlSetting urlSetting;
 
+    private final GeomagneticStorm geomagneticStorm;
+
+    private final GeomagneticStormModel stormModel;
+
     private boolean startStorm;
 
     @Autowired
-    public GeomagneticStormUtil(GeomagneticStorm geomagneticStorm, EmailSetting emailSetting, GeomagneticStormModel stormModel) {
+    public GeomagneticStormUtil(GeomagneticStorm geomagneticStorm, GeomagneticStormModel stormModel) {
         this.geomagneticStorm = geomagneticStorm;
-        this.emailSetting = emailSetting;
         this.stormModel = stormModel;
     }
 
-    //проверка бури с индексом > 4 каждые 3 часа и отправка ссобщения на эл. почту
-    @Scheduled(fixedRate = 30 * 1000 * 1000)
+    // check storm every 15 minutes, if kpIndex > 4, then will be sent message to email
+    @Scheduled(fixedRate = 15 * 1000 * 1000)
     public void checkStormEvery3Hour() {
         check(stormModel);
     }
@@ -60,11 +62,11 @@ public class GeomagneticStormUtil {
 
         try {
             GeomagneticStormModel stormModelForCheck = getStormModel(stormModel);
-            if (stormModelForCheck.getKp_index() > 4) {
+            if (stormModelForCheck.getKpIndex() > 4) {
                 startStorm = true;
                 String storm = geomagneticStorm.getGeomagneticStorm();
                 sender.send("Геомагнитная буря!", storm + description, emailSetting.getEmailSender());
-            } else if (startStorm && stormModelForCheck.getKp_index() < 4) {
+            } else if (startStorm && stormModelForCheck.getKpIndex() < 4) {
                 startStorm = false;
                 String storm = geomagneticStorm.getGeomagneticStorm();
                 sender.send("Геомагнитная буря закончилась", storm, emailSetting.getEmailSender());
@@ -79,13 +81,16 @@ public class GeomagneticStormUtil {
         String jsonStringFormat = ReadJSONUtil.getJSONStringFormat(url);
 
         if (!jsonStringFormat.isEmpty()) {
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                    .create();
 
             Type collectionType = new TypeToken<Collection<GeomagneticStormModel>>() {
             }.getType();
+            // get the List<GeomagneticStormModel> from json
             List<GeomagneticStormModel> listStormModel = gson.fromJson(jsonStringFormat, collectionType);
 
-            //смотрим индекс на ближайшее время
+            //return last kpIndex
             if (!listStormModel.isEmpty()) {
                 stormModel = listStormModel.get(listStormModel.size() - 1);
                 return stormModel;

@@ -39,7 +39,7 @@ public class DrawVillageOnMap {
         // Obtain the Graphics2D context associated with the BufferedImage.
         Graphics2D g = img.createGraphics();
 
-        //set the mark on the map village Мозоли
+        //set the mark on the map village
         Font font = new Font("TimesRoman", Font.PLAIN, 9);
         g.setFont(font);
         g.setPaint(Color.BLACK);

@@ -1,53 +1,61 @@
 package com.service;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.model.CurrencyModel;
-import org.json.JSONObject;
-import org.springframework.stereotype.Service;
+import com.settings.CurrencySetting;
 import com.util.ReadJSONUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class Currency {
 
-    public String getCurrency(CurrencyModel currencyModel) throws IOException {
-        List<Integer> currencyList = new ArrayList<Integer>() {{
-            add(145);
-            add(292);
-            add(298);
-        }};
+    @Autowired
+    private CurrencySetting currencySetting;
 
+    public String getCurrency() throws IOException {
+        List<Integer> currencyList = currencySetting.getListCurrencies();
+
+        //get current date in format "dd.MM.yyyy"
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
         String currentDate = simpleDateFormat.format(date);
 
-        StringBuilder finalAnswer = new StringBuilder("Курс валют на " + currentDate + "\n");
+        StringBuilder finalMessage = new StringBuilder("Курс валют на " + currentDate + "\n");
 
         for (Integer idCurrency : currencyList) {
+            URL url = new URL(currencySetting.getUrlApi() + "" + idCurrency);
 
-            URL url = new URL("http://www.nbrb.by/API/ExRates/Rates/" + idCurrency);
-            JSONObject object = ReadJSONUtil.readJSONFromUrl(url);
+            String jsonStringFormat = ReadJSONUtil.getJSONStringFormat(url);
 
-            String abbreviation = object.getString("Cur_Abbreviation");
-            if (abbreviation.equals("RUB")){
-                abbreviation = "100RUB";
+            if (!jsonStringFormat.isEmpty()) {
+                Gson gson = new Gson();
+
+                Type curr = new TypeToken<CurrencyModel>() {
+                }.getType();
+
+                // get the CurrencyModel from json
+                CurrencyModel currentCurrencyModel = gson.fromJson(jsonStringFormat, curr);
+
+                if (currentCurrencyModel.getCurAbbreviation().equals("RUB")){
+                    currentCurrencyModel.setCurAbbreviation("100RUB");
+                }
+
+                finalMessage
+                        .append(currentCurrencyModel.getCurAbbreviation())
+                        .append(" равен ")
+                        .append(currentCurrencyModel.getCurOfficialRate())
+                        .append("\n");
             }
-            double officialRate = object.getDouble("Cur_OfficialRate");
-            currencyModel.setAbbreviation(abbreviation);
-            currencyModel.setOfficialRate(officialRate);
-
-            finalAnswer.append(currencyModel.getAbbreviation())
-                    .append(" равен ")
-                    .append(currencyModel.getOfficialRate())
-                    .append("\n");
         }
-
-        return finalAnswer.toString();
-
+        return finalMessage.toString();
     }
 }

@@ -3,6 +3,7 @@ bot:
   username: itover9000_bot
 
 url:
+  urlMainPageMeteoinfo: http://www.meteoinfo.by/radar/?q=UMMN&t=0
   urlToGifFile: http://www.meteoinfo.by/radar/UMMN/radar-map.gif
   gifFileNameFromMeteoinfo: radar-map.gif
   urlToBoredapi: https://www.boredapi.com/api/activity
@@ -17,3 +18,13 @@ email:
 yandex:
   key: key=trnsl.1.1.20190511T083532Z.659a23627272fcf1.ab2b6c844422017a936d29c902783ebb3659700a
   url: https://translate.yandex.net/api/v1.5/tr.json/translate?
+
+currency:
+  listCurrencies:
+# USD
+    - 145
+# EUR
+    - 292
+# RUB
+    - 298
+  urlApi: http://www.nbrb.by/API/ExRates/Rates/

@@ -48,25 +48,27 @@ public class GeomagneticStorm {
 
     public String getGeomagneticStorm() throws IOException {
 
-        URL url = new URL("https://services.swpc.noaa.gov/json/planetary_k_index_1m.json");
+        URL url = new URL(urlSetting.getUrlToGeomagneticSite());
         String jsonStringFormat = ReadJSONUtil.getJSONStringFormat(url);
 
         if (!jsonStringFormat.isEmpty()) {
             Gson gson = new Gson();
 
+            // get List<GeomagneticStormModel> from json
             Type collectionType = new TypeToken<Collection<GeomagneticStormModel>>() {
             }.getType();
             List<GeomagneticStormModel> listStormModel = gson.fromJson(jsonStringFormat, collectionType);
 
             if (!listStormModel.isEmpty()) {
 
+                //check last kpIndex in List
                 GeomagneticStormModel stormModel = listStormModel.get(listStormModel.size() - 1);
 
                 StringBuilder returnText = new StringBuilder()
-                        .append("Kp индекс шторма = ").append(stormModel.getKp_index()).append("\n")
-                        .append("время ").append(parseGeomagneticStorm(stormModel.getTime_tag()));
+                        .append("Kp индекс шторма = ").append(stormModel.getKpIndex()).append("\n")
+                        .append("время ").append(parseGeomagneticStorm(stormModel.getTimeTag()));
 
-                if (stormModel.getKp_index() > 4) {
+                if (stormModel.getKpIndex() > 4) {
                     returnText.append("\nВнимание, сильная буря!");
                 }
                 return String.valueOf(returnText);
