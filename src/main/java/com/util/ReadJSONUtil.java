@@ -11,13 +11,17 @@ import java.util.Scanner;
 
 @Service
 public class ReadJSONUtil {
+
+    private ReadJSONUtil() {
+    }
+
     public static JSONObject readJSONFromUrl(URL url) throws IOException {
         String result = getJSONStringFormat(url);
 
         return new JSONObject(result);
     }
 
-    //возвращаем json  в формате String
+    //return json in String format
     public static String getJSONStringFormat(URL url) throws IOException {
         Scanner in = new Scanner((InputStream) url.getContent());
         StringBuilder result = new StringBuilder();

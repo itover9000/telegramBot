@@ -10,7 +10,8 @@ import com.service.BoredApi;
 import com.service.Currency;
 import com.service.GeomagneticStorm;
 import com.service.Weather;
-import com.settings.ApplicationSetting;
+import com.settings.BotSetting;
+import com.settings.UrlSetting;
 import com.util.MeteoradarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,12 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-//@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class Bot extends TelegramLongPollingBot {
 
     private final MeteoradarUtil meteoradarUtil;
 
-    private final ApplicationSetting setting;
+    private final BotSetting botSetting;
     private final WeatherModel weatherModel;
     private final CurrencyModel currencyModel;
     private final BoredModel boredModel;
@@ -46,8 +46,10 @@ public class Bot extends TelegramLongPollingBot {
     private final BoredApi boredApi;
     private final Currency currency;
 
+    private final UrlSetting urlSetting;
+
     @Autowired
-    public Bot(WeatherModel weatherModel, CurrencyModel currencyModel, BoredModel boredModel, GeomagneticStormModel stormModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency, ApplicationSetting setting, MeteoradarUtil meteoradarUtil) {
+    public Bot(WeatherModel weatherModel, CurrencyModel currencyModel, BoredModel boredModel, GeomagneticStormModel stormModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency, BotSetting botSetting, MeteoradarUtil meteoradarUtil, UrlSetting urlSetting) {
         this.weatherModel = weatherModel;
         this.currencyModel = currencyModel;
         this.boredModel = boredModel;
@@ -55,8 +57,9 @@ public class Bot extends TelegramLongPollingBot {
         this.geomagneticStorm = geomagneticStorm;
         this.boredApi = boredApi;
         this.currency = currency;
-        this.setting = setting;
+        this.botSetting = botSetting;
         this.meteoradarUtil = meteoradarUtil;
+        this.urlSetting = urlSetting;
     }
 
     public void onUpdateReceived(Update update) {
@@ -66,7 +69,7 @@ public class Bot extends TelegramLongPollingBot {
             switch (message.getText().toLowerCase().trim()) {
                 case "магн. буря":
                     try {
-                        sendMsg(message, geomagneticStorm.getGeomagneticStorm(stormModel));
+                        sendMsg(message, geomagneticStorm.getGeomagneticStorm());
 
                     } catch (IOException e) {
                         sendMsg(message, "что-то пошло не так");
@@ -85,7 +88,7 @@ public class Bot extends TelegramLongPollingBot {
                         //сообщение о времени картинки
                         sendMsg(message, "погода " + meteoradarUtil.getTimeFromSiteWithNewTime(meteoradarUtil.getTitle()));
                     } catch (TelegramApiException | IOException | ParseException e) {
-                        sendMsg(message, "что-то пошло не так");
+                        sendMsg(message, "данные на сайте недоступны");
                         e.printStackTrace();
                     } catch (InvalidURLException | NoDataOnTheSiteException e) {
                         sendMsg(message, "Сайт не предоставил данные");
@@ -95,20 +98,16 @@ public class Bot extends TelegramLongPollingBot {
 
                 case "анимация погоды":
                     try {
-                        //пересылаю анимацию о погоде за последние 3 часа
-                        //Качественная гифка только если отправлять через SendVideo
-                        /* Если передавать .setAnimation("http://www.meteoinfo.by/radar/UMMN/radar-map.gif")
-                         * то приходит гифка за 2017 год ????
-                         * поэтому такой костыль*/
-
+                        //send animation about the weather for the last 3 hours
                         execute(new SendVideo()
                                 .setVideo(new File(
                                         meteoradarUtil.getPathToFileInRootProject(
-                                                "http://www.meteoinfo.by/radar/UMMN/radar-map.gif", "radar-map.gif")))
+                                                urlSetting.getUrlToGifFile(), urlSetting.getGifFileNameFromMeteoinfo())))
                                 .setChatId(message.getChatId().toString()));
                     } catch (TelegramApiException e) {
                         sendMsg(message, "что-то пошло не так");
-                    } catch (IOException e) {
+                    } catch (IOException | InvalidURLException e) {
+                        sendMsg(message, "данные на сайте недоступны");
                         e.printStackTrace();
                     }
                     break;
@@ -180,10 +179,10 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public String getBotUsername() {
-        return setting.getUsername();
+        return botSetting.getUsername();
     }
 
     public String getBotToken() {
-        return setting.getToken();
+        return botSetting.getToken();
     }
 }

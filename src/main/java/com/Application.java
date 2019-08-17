@@ -1,20 +1,17 @@
 package com;
 
-import com.model.GeomagneticStormModel;
-import com.util.GeomagneticStormUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.telegram.telegrambots.ApiContextInitializer;
 
 @EnableAspectJAutoProxy
 @SpringBootApplication
+@EnableScheduling
 public class Application {
     public static void main(String[] args) {
         ApiContextInitializer.init();
         SpringApplication.run(Application.class, args);
-
-        //проверка бури с индексом > 4 каждые 3 часа и отправка ссобщения на эл. почту
-        GeomagneticStormUtil.checkStormEvery3Hour(new GeomagneticStormModel());
     }
 }

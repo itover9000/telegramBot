@@ -3,63 +3,79 @@ package com.util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.model.GeomagneticStormModel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.service.GeomagneticStorm;
 import com.service.Sender;
+import com.settings.EmailSetting;
+import com.settings.UrlSetting;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class GeomagneticStormUtil {
 
+    private final GeomagneticStorm geomagneticStorm;
+
+    private final EmailSetting emailSetting;
+
+    private final GeomagneticStormModel stormModel;
+
     @Autowired
-    private static GeomagneticStorm geomagneticStorm;
+    private UrlSetting urlSetting;
 
-    private static Sender sender = new Sender("h.dabravolskay@yandex.ru", "tratata88");
-    private static boolean startStorm;
+    private boolean startStorm;
 
-    //проверка бури с индексом > 4 каждые 3 часа и отправка ссобщения на эл. почту
-    public static void checkStormEvery3Hour(GeomagneticStormModel stormModel) {
-
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> check(stormModel), 0, 3, TimeUnit.HOURS);
+    @Autowired
+    public GeomagneticStormUtil(GeomagneticStorm geomagneticStorm, EmailSetting emailSetting, GeomagneticStormModel stormModel) {
+        this.geomagneticStorm = geomagneticStorm;
+        this.emailSetting = emailSetting;
+        this.stormModel = stormModel;
     }
 
-    private static void check(GeomagneticStormModel stormModel) {
-        String stormGeomagneticStorm = "нет данных";
-        String description = "\nКачественно состояние магнитного поля в зависимости от Кp индекса\n" +
-                "Kp <= 2 — спокойное;\n" +
-                "Kp = 2, 3 — слабовозмущенное; \n" +
-                "Kp = 4 — возмущенное; \n" +
-                "Kp = 5, 6 — магнитная буря; \n" +
-                "Kp >= 7 — сильная магнитная буря.";
+    //проверка бури с индексом > 4 каждые 3 часа и отправка ссобщения на эл. почту
+    @Scheduled(fixedRate = 30 * 1000 * 1000)
+    public void checkStormEvery3Hour() {
+        check(stormModel);
+    }
+
+    private void check(GeomagneticStormModel stormModel) {
+        Sender sender = Sender.builder()
+                .username(emailSetting.getEmailSender())
+                .password(emailSetting.getPasswordSender())
+                .build();
+
+        StringBuilder description = new StringBuilder()
+                .append("\nКачественно состояние магнитного поля в зависимости от Кp индекса\n")
+                .append("Kp <= 2 — спокойное;\n")
+                .append("Kp = 2, 3 — слабовозмущенное; \n")
+                .append("Kp = 4 — возмущенное; \n")
+                .append("Kp = 5, 6 — магнитная буря; \n")
+                .append("Kp >= 7 — сильная магнитная буря.");
+
         try {
             GeomagneticStormModel stormModelForCheck = getStormModel(stormModel);
             if (stormModelForCheck.getKp_index() > 4) {
                 startStorm = true;
-                String storm = GeomagneticStormUtil.geomagneticStorm.getGeomagneticStorm(stormModel);
-                sender.send("Геомагнитная буря!", storm + description, "h.dabravolskay@yandex.ru", "over9000@tut.by");
-//                System.out.println(storm);
+                String storm = geomagneticStorm.getGeomagneticStorm();
+                sender.send("Геомагнитная буря!", storm + description, emailSetting.getEmailSender());
             } else if (startStorm && stormModelForCheck.getKp_index() < 4) {
                 startStorm = false;
-                String storm = GeomagneticStormUtil.geomagneticStorm.getGeomagneticStorm(stormModel);
-                sender.send("Геомагнитная буря закончилась", storm, "h.dabravolskay@yandex.ru", "over9000@tut.by");
+                String storm = geomagneticStorm.getGeomagneticStorm();
+                sender.send("Геомагнитная буря закончилась", storm, emailSetting.getEmailSender());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static GeomagneticStormModel getStormModel(GeomagneticStormModel stormModel) throws IOException {
-        URL url = new URL("https://services.swpc.noaa.gov/json/planetary_k_index_1m.json");
+    private GeomagneticStormModel getStormModel(GeomagneticStormModel stormModel) throws IOException {
+        URL url = new URL(urlSetting.getUrlToGeomagneticSite());
         String jsonStringFormat = ReadJSONUtil.getJSONStringFormat(url);
 
         if (!jsonStringFormat.isEmpty()) {

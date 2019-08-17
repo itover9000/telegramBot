@@ -1,6 +1,7 @@
 package com.service;
 
 import com.model.BoredModel;
+import com.settings.UrlSetting;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ import static org.junit.Assert.*;
 public class BoredApiTest {
 
     @Autowired
+    private UrlSetting urlSetting;
+
+    @Autowired
     private BoredModel model;
 
     @Autowired
@@ -26,7 +30,8 @@ public class BoredApiTest {
     public void getBoredStringFormat() throws IOException {
 
         URL urlResource = ClassLoader.getSystemResource("bored.json");
-        boredApi = new BoredApi(urlResource);
+//        boredApi = new BoredApi(urlResource);
+//        boredApi = new BoredApi(urlSetting);
 
         //прочитали json из ресурсов, достали название мероприятия, количество участников и перевели
         String boredStringFormat = boredApi.getBoredStringFormat(model);

@@ -1,35 +1,34 @@
 package com.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Properties;
+import lombok.Builder;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 
+@Builder
 public class Sender {
-//tratata88
     private String username;
     private String password;
     private Properties props;
 
-//    @Autowired
-    public Sender(String username, String password) {
-        this.username = username;
-        this.password = password;
+//    public Sender(String username, String password) {
+//        this.username = username;
+//        this.password = password;
+//
+//        props = new Properties();
+//        props.setProperty("mail.smtp.host", "smtp.yandex.ru");
+//        props.setProperty("mail.smtp.port", "465");
+//        props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//        props.setProperty("mail.smtp.socketFactory.port", "465");
+//        props.setProperty("mail.smtp.auth", "true");
+//    }
 
-        props = new Properties();
-        props.setProperty("mail.smtp.host", "smtp.yandex.ru");
-        props.setProperty("mail.smtp.port", "465");
-        props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.setProperty("mail.smtp.socketFactory.port", "465");
-        props.setProperty("mail.smtp.auth", "true");
-    }
-
-    public void send(String subject, String text, String fromEmail, String toEmail){
+    public void send(String subject, String text, String toEmail){
         Session session = Session.getInstance(props, new Authenticator() {
+
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
             }
@@ -37,19 +36,19 @@ public class Sender {
 
         try {
             Message message = new MimeMessage(session);
-            //от кого
+            //from whom
             message.setFrom(new InternetAddress(username));
-            //кому
+            //to whom
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
-            //Заголовок письма
+            //email subject
             message.setSubject(subject);
-            //Содержимое
+            //email body
             message.setText(text);
 
-            //Отправляем сообщение
+            //send email
             Transport.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }

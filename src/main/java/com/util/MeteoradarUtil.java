@@ -50,9 +50,10 @@ public class MeteoradarUtil {
 
     public String getImageFromUrl() throws IOException, InvalidURLException, NoDataOnTheSiteException {
         Document doc = Jsoup.connect(link).get();
-        Element table = null;
+        Element table;
+
         //проверка на существование таблицы
-        if (!doc.select("table").isEmpty() && ((doc.select("table").size() >= 3))) {
+        if (!doc.select("table").isEmpty() && doc.select("table").size() >= 3) {
             table = doc.select("table").get(2); //select the third table.
         } else throw new NoDataOnTheSiteException("Invalid URL");
         Elements rows = table.select("tr");
@@ -73,7 +74,7 @@ public class MeteoradarUtil {
 
     public String getTimeFromSiteWithNewTime(String title) throws ParseException {
         if (title != null && !title.isEmpty()) {
-            //олучаем время в формате "HH:mm"  16:35
+            //get time in the format "HH:mm"  16:35
             String validTime = parseTitleForGettingTime(title);
 
             //получаем дату в формате dd.MM 13.06
@@ -156,8 +157,7 @@ public class MeteoradarUtil {
     }
 
     public String parseTitleForGettingTime(String text) {
-        //возвращаем из текста время в формате HH:mm
-//        Time24HoursValidator validator = new Time24HoursValidator();
+        // return time from the text in the format HH: mm
         String resultTime = "";
         String[] splitText = text.split(" ");
         for (String time : splitText) {
@@ -182,7 +182,7 @@ public class MeteoradarUtil {
         return resultDate;
     }
 
-    public String getPathToFileInRootProject(String urlForDownloadGif, String fileName) throws IOException {
+    public String getPathToFileInRootProject(String urlForDownloadGif, String fileName) throws IOException, InvalidURLException {
         File file = new File(fileName);
         URL website = new URL(urlForDownloadGif);
 
@@ -192,7 +192,9 @@ public class MeteoradarUtil {
         } else {
             long contentLengthGif = website.openConnection().getContentLengthLong();
             //если файл отличается по размеру, то заменяем на новый файл
-            if (file.length() != contentLengthGif) {
+            if (contentLengthGif == -1) {
+                throw new InvalidURLException("Invalid URL");
+            } else if (file.length() != contentLengthGif) {
                 copyGifToRootProject(file, website);
             }
         }
@@ -200,10 +202,11 @@ public class MeteoradarUtil {
     }
 
     private void copyGifToRootProject(File file, URL website) throws IOException {
-        ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-        FileOutputStream fos = new FileOutputStream(file.toString());
-        //максимальный размер 5Mb
-        fos.getChannel().transferFrom(rbc, 0, 5 * 1024 * 1024);
+        try (ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+             FileOutputStream fos = new FileOutputStream(file.toString())) {
+            //max size 5Mb
+            fos.getChannel().transferFrom(rbc, 0, 5 * 1024 * 1024);
+        }
     }
 
     public String getLink() {

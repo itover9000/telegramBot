@@ -1,3 +1,19 @@
 bot:
   token: 884639123:AAGJUFOWF9hoyk4_qM7vNw3YFYHXpsxVAMA
   username: itover9000_bot
+
+url:
+  urlToGifFile: http://www.meteoinfo.by/radar/UMMN/radar-map.gif
+  gifFileNameFromMeteoinfo: radar-map.gif
+  urlToBoredapi: https://www.boredapi.com/api/activity
+  urlToGeomagneticSite: https://services.swpc.noaa.gov/json/planetary_k_index_1m.json
+
+email:
+  emailSender: h.dabravolskay@yandex.ru
+  passwordSender: tratata88
+
+  emailRecipient: over9000@tut.by
+
+yandex:
+  key: key=trnsl.1.1.20190511T083532Z.659a23627272fcf1.ab2b6c844422017a936d29c902783ebb3659700a
+  url: https://translate.yandex.net/api/v1.5/tr.json/translate?

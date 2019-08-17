@@ -61,7 +61,7 @@ public class MeteoradarUtilTest {
     }
 
     @Test
-    public void getPathToGifFile() throws IOException {
+    public void getPathToGifFile() throws IOException, InvalidURLException {
 
         //проверка на доступность ссылки(код 200) "http://www.meteoinfo.by/radar/UMMN/radar-map.gif"
         URL linkToImage = new URL("http://www.meteoinfo.by/radar/UMMN/radar-map.gif");

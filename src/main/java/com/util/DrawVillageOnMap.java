@@ -36,25 +36,19 @@ public class DrawVillageOnMap {
         // Open picture file, load into a BufferedImage.
         BufferedImage img = ImageIO.read(new File(pathToMap));
 
-// Obtain the Graphics2D context associated with the BufferedImage.
+        // Obtain the Graphics2D context associated with the BufferedImage.
         Graphics2D g = img.createGraphics();
 
-// Draw on the BufferedImage via the graphics context.
-//        int x = 191;
-//        int y = 188;
-//        int width = 4;
-//        int height = 4;
-
-        //подгоняем под карту координаты деревни Мозоли
+        //set the mark on the map village Мозоли
         Font font = new Font("TimesRoman", Font.PLAIN, 9);
-//        String message = "Мозоли";
         g.setFont(font);
         g.setPaint(Color.BLACK);
         g.drawOval(x, y, width, height);
 
         g.drawString(message, x - 13, y - 1);
         ImageIO.write(img, "gif", new File(pathToMap));
-// Clean up -- dispose the graphics context that was created.;
+
+        // Clean up -- dispose the graphics context that was created
         g.dispose();
     }
 }

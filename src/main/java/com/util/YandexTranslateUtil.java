@@ -1,32 +1,56 @@
 package com.util;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.model.YandexModel;
+import com.settings.YandexSettings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 @Service
 public class YandexTranslateUtil {
-     private static final String key = "key=trnsl.1.1.20190511T083532Z.659a23627272fcf1.ab2b6c844422017a936d29c902783ebb3659700a";
-     private static final String url ="https://translate.yandex.net/api/v1.5/tr.json/translate?";
+
+    @Autowired
+    private YandexSettings yandexSettings;
+
+    public String translateFromEnToRu(String text) throws IOException {
+
+        // replace all spaces with% 20 characters for the correct link
+        String textWithSpacesReplaced = text.replace(" ", "%20");
+
+        StringBuilder fullUrl = new StringBuilder()
+                .append(yandexSettings.getUrl())
+                .append(yandexSettings.getKey())
+                .append("&text=")
+                .append(textWithSpacesReplaced)
+                .append("&lang=en-ru");
 
 
-    public static String translateFromEnToRu(String text) throws IOException {
-        String textForUrlAndLanguage = ("&text=" + text + "&lang=en-ru").replaceAll(" ", "%20");
-        URL urlObj = new URL(url + key  + textForUrlAndLanguage);
+        URL urlObj = new URL(String.valueOf(fullUrl));
 
-        JSONObject object = ReadJSONUtil.readJSONFromUrl(urlObj);
-        JSONArray jsonArray = object.getJSONArray("text");
-        StringBuilder translate= new StringBuilder();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            translate.append(jsonArray.getString(i));
-        }
+        String jsonStringFormat = ReadJSONUtil.getJSONStringFormat(urlObj);
 
-        //устанавливаю кодировку UTF_8 для корректного отображения
-        return new String(String.valueOf(translate).getBytes(), StandardCharsets.UTF_8);
+        Gson gson = new Gson();
+        Type collectionType = new TypeToken<YandexModel>() {
+        }.getType();
+        // get the object from json
+        YandexModel yandexModel = gson.fromJson(jsonStringFormat, collectionType);
+
+
+        StringBuilder translate = new StringBuilder();
+        if (yandexModel.getCode() == 200) {
+            for (String textFromModel : yandexModel.getText()) {
+                translate.append(textFromModel);
+            }
+
+            //set the encoding UTF_8 for correct display
+            return new String(String.valueOf(translate).getBytes(), StandardCharsets.UTF_8);
+        } else return "Не удалось получить данные";
     }
 
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 @ConfigurationProperties("bot")
-public class ApplicationSetting {
+public class BotSetting {
     private String token;
     private String username;
 }
