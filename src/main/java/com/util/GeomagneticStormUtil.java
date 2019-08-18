@@ -1,12 +1,10 @@
 package com.util;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.model.GeomagneticStormModel;
 import com.service.GeomagneticStorm;
-import com.service.Sender;
+import com.service.MailSender;
 import com.settings.EmailSetting;
 import com.settings.UrlSetting;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,9 @@ public class GeomagneticStormUtil {
     @Autowired
     private UrlSetting urlSetting;
 
+    @Autowired
+    private MailSender mailSender;
+
     private final GeomagneticStorm geomagneticStorm;
 
     private final GeomagneticStormModel stormModel;
@@ -47,10 +48,6 @@ public class GeomagneticStormUtil {
     }
 
     private void check(GeomagneticStormModel stormModel) {
-        Sender sender = Sender.builder()
-                .username(emailSetting.getEmailSender())
-                .password(emailSetting.getPasswordSender())
-                .build();
 
         StringBuilder description = new StringBuilder()
                 .append("\nКачественно состояние магнитного поля в зависимости от Кp индекса\n")
@@ -65,11 +62,11 @@ public class GeomagneticStormUtil {
             if (stormModelForCheck.getKpIndex() > 4) {
                 startStorm = true;
                 String storm = geomagneticStorm.getGeomagneticStorm();
-                sender.send("Геомагнитная буря!", storm + description, emailSetting.getEmailSender());
+                mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря!", storm + description);
             } else if (startStorm && stormModelForCheck.getKpIndex() < 4) {
                 startStorm = false;
                 String storm = geomagneticStorm.getGeomagneticStorm();
-                sender.send("Геомагнитная буря закончилась", storm, emailSetting.getEmailSender());
+                mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря закончилась", storm);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,9 +78,7 @@ public class GeomagneticStormUtil {
         String jsonStringFormat = ReadJSONUtil.getJSONStringFormat(url);
 
         if (!jsonStringFormat.isEmpty()) {
-            Gson gson = new GsonBuilder()
-                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                    .create();
+            Gson gson =new Gson();
 
             Type collectionType = new TypeToken<Collection<GeomagneticStormModel>>() {
             }.getType();
@@ -95,7 +90,6 @@ public class GeomagneticStormUtil {
                 stormModel = listStormModel.get(listStormModel.size() - 1);
                 return stormModel;
             }
-
         }
         return stormModel;
     }

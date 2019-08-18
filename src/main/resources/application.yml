@@ -21,10 +21,18 @@ yandex:
 
 currency:
   listCurrencies:
-# USD
+    # USD
     - 145
-# EUR
+    # EUR
     - 292
-# RUB
+    # RUB
     - 298
   urlApi: http://www.nbrb.by/API/ExRates/Rates/
+
+spring:
+  mail:
+    host: smtp.yandex.ru
+    username: h.dabravolskay@yandex.ru
+    password: tratata88
+    port: 465
+    protocol: smtps
