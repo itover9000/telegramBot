@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class MailSender {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private JavaMailSender javaMailSender;
 
     @Autowired
     private MailSenderSetting mailSenderSetting;
@@ -23,6 +23,6 @@ public class MailSender {
         mailMessage.setSubject(subject);
         mailMessage.setText(message);
 
-        mailSender.send(mailMessage);
+        javaMailSender.send(mailMessage);
     }
 }

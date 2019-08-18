@@ -7,6 +7,8 @@ import com.service.GeomagneticStorm;
 import com.service.MailSender;
 import com.settings.MailSenderSetting;
 import com.settings.UrlSetting;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ import java.util.List;
 
 @Service
 public class GeomagneticStormUtil {
+    private static final Logger logger = LogManager.getLogger(GeomagneticStormUtil.class);
+    private static final String MESSAGE_LOGGER = "An exception occurred!";
 
     @Autowired
     private MailSenderSetting emailSetting;
@@ -69,7 +73,7 @@ public class GeomagneticStormUtil {
                 mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря закончилась", storm);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+           logger.error(MESSAGE_LOGGER, e);
         }
     }
 

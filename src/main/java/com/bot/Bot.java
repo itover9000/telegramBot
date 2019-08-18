@@ -9,6 +9,8 @@ import com.service.GeomagneticStorm;
 import com.settings.BotSetting;
 import com.settings.UrlSetting;
 import com.util.MeteoradarUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -30,6 +32,9 @@ import java.util.List;
 
 @Component
 public class Bot extends TelegramLongPollingBot {
+    private static final Logger logger = LogManager.getLogger(Bot.class);
+    private static final String MESSAGE_LOGGER = "An exception occurred!";
+    private static final String MESSAGE_ANSWER= "что-то пошло не так";
 
     private final MeteoradarUtil meteoradarUtil;
 
@@ -40,6 +45,7 @@ public class Bot extends TelegramLongPollingBot {
     private final Currency currency;
 
     private final UrlSetting urlSetting;
+
 
     @Autowired
     public Bot(BoredModel boredModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi,
@@ -63,27 +69,26 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, geomagneticStorm.getGeomagneticStorm());
 
                     } catch (IOException e) {
-                        sendMsg(message, "что-то пошло не так");
-                        e.printStackTrace();
+                        sendMsg(message, MESSAGE_ANSWER);
+                        logger.error(MESSAGE_LOGGER, e);
                     }
                     break;
 
                 case "текущая погода":
                     try {
-                        //пересылаю картинку с сайта
-                        //предварительно помечаю место на карте
+                        //send a picture from the site, mark the place on the map
                         execute(new SendPhoto()
-                                .setPhoto(new File(meteoradarUtil.getMapWithVillage("radar-map.png")))
+                                .setPhoto(new File(meteoradarUtil.getMapWithVillage(urlSetting.getGifFileNameFromMeteoinfo())))
                                 .setChatId(message.getChatId().toString()));
 
-                        //сообщение о времени картинки
+                        //picture time message
                         sendMsg(message, "погода " + meteoradarUtil.getTimeFromSiteWithNewTime(meteoradarUtil.getTitle()));
                     } catch (TelegramApiException | IOException | ParseException e) {
-                        sendMsg(message, "данные на сайте недоступны");
-                        e.printStackTrace();
+                        sendMsg(message, "Данные на сайте недоступны");
+                        logger.error(MESSAGE_LOGGER, e);
                     } catch (InvalidUrlException | NoDataOnTheSiteException e) {
                         sendMsg(message, "Сайт не предоставил данные");
-                        e.printStackTrace();
+                        logger.error(MESSAGE_LOGGER, e);
                     }
                     break;
 
@@ -96,26 +101,26 @@ public class Bot extends TelegramLongPollingBot {
                                                 urlSetting.getUrlToGifFile(), urlSetting.getGifFileNameFromMeteoinfo())))
                                 .setChatId(message.getChatId().toString()));
                     } catch (TelegramApiException e) {
-                        sendMsg(message, "что-то пошло не так");
+                        sendMsg(message, MESSAGE_ANSWER);
                     } catch (IOException | InvalidUrlException e) {
-                        sendMsg(message, "данные на сайте недоступны");
-                        e.printStackTrace();
+                        sendMsg(message, "Данные на сайте недоступны");
+                        logger.error(MESSAGE_LOGGER, e);
                     }
                     break;
                 case "скучно!":
                     try {
                         sendMsg(message, boredApi.getBoredStringFormat(boredModel));
                     } catch (IOException e) {
-                        sendMsg(message, "что-то пошло не так");
-                        e.printStackTrace();
+                        sendMsg(message, MESSAGE_ANSWER);
+                        logger.error(MESSAGE_LOGGER, e);
                     }
                     break;
                 case "курс валют":
                     try {
                         sendMsg(message, currency.getCurrency());
                     } catch (IOException e) {
-                        sendMsg(message, "что-то пошло не так");
-                        e.printStackTrace();
+                        sendMsg(message, MESSAGE_ANSWER);
+                        logger.error(MESSAGE_LOGGER, e);
                     }
                     break;
 
@@ -138,7 +143,7 @@ public class Bot extends TelegramLongPollingBot {
             execute(sendMessage);
 
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error(MESSAGE_LOGGER, e);
         }
     }
 

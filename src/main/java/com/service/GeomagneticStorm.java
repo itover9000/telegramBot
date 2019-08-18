@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.model.GeomagneticStormModel;
 import com.settings.UrlSetting;
+import com.util.ReadJSONUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.util.ReadJSONUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -22,6 +24,8 @@ import java.util.TimeZone;
 
 @Service
 public class GeomagneticStorm {
+    private static final Logger logger = LogManager.getLogger(GeomagneticStorm.class);
+    private static final String MESSAGE_LOGGER = "An exception occurred!";
 
     @Autowired
     private UrlSetting urlSetting;
@@ -41,7 +45,7 @@ public class GeomagneticStorm {
 
             return format.toLocalizedPattern();
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(MESSAGE_LOGGER, e);
         }
         return format.toLocalizedPattern();
     }
