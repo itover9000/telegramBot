@@ -1,6 +1,6 @@
 package com.service;
 
-import com.settings.MailSenderExperimental;
+import com.settings.MailSenderSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,12 +13,12 @@ public class MailSender {
     private JavaMailSender mailSender;
 
     @Autowired
-    private MailSenderExperimental mailSenderExperimental;
+    private MailSenderSetting mailSenderSetting;
 
     public void send(String emailTo, String subject, String message) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        mailMessage.setFrom(mailSenderExperimental.getUsername());
+        mailMessage.setFrom(mailSenderSetting.getUsername());
         mailMessage.setTo(emailTo);
         mailMessage.setSubject(subject);
         mailMessage.setText(message);

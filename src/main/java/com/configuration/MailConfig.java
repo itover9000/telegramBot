@@ -1,6 +1,6 @@
 package com.configuration;
 
-import com.settings.MailSenderExperimental;
+import com.settings.MailSenderSetting;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,7 +12,7 @@ import java.util.Properties;
 public class MailConfig {
 
     @Bean
-    public JavaMailSender getMailSender( MailSenderExperimental emailSetting) {
+    public JavaMailSender getMailSender(MailSenderSetting emailSetting) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
         mailSender.setHost(emailSetting.getHost());

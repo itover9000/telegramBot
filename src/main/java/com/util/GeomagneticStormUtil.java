@@ -5,7 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.model.GeomagneticStormModel;
 import com.service.GeomagneticStorm;
 import com.service.MailSender;
-import com.settings.EmailSetting;
+import com.settings.MailSenderSetting;
 import com.settings.UrlSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,7 +21,7 @@ import java.util.List;
 public class GeomagneticStormUtil {
 
     @Autowired
-    private EmailSetting emailSetting;
+    private MailSenderSetting emailSetting;
 
     @Autowired
     private UrlSetting urlSetting;

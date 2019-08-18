@@ -7,11 +7,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 @ConfigurationProperties("spring.mail")
-public class MailSenderExperimental {
+public class MailSenderSetting {
 
     private String host;
     private String username;
     private String password;
     private int port;
     private String protocol;
+    private String emailRecipient;
 }
