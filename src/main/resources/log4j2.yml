@@ -1,0 +1,29 @@
+Configuration:
+  status: warn
+  Properties:
+    Property:
+      - name:   pattern_layout_console
+        value:  "%d %level %logger - %-4relative [%thread] - %msg%n"
+      - name:   USER_HOME
+        value:  ${sys:user.home}
+  Appenders:
+    Console:
+      name: Console
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "${pattern_layout_console}"
+    File:
+      name: FileAppender
+      fileName: "logs/logfile.log"
+      PatternLayout:
+        Pattern: "${pattern_layout_console}"
+      ThresholdFilter:
+        level: WARN
+        onMatch: ACCEPT
+        onMismatch: DENY
+  Loggers:
+    Root:
+      level: INFO
+      AppenderRef:
+        - ref: Console
+        - ref: FileAppender
