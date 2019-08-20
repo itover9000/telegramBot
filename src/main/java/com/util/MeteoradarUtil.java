@@ -2,7 +2,7 @@ package com.util;
 
 import com.enums.TimeEnum;
 import com.exception.InvalidUrlException;
-import com.exception.NoDataOnTheSiteException;
+import com.exception.NoDataOnSiteException;
 import com.settings.UrlSetting;
 import org.apache.commons.validator.UrlValidator;
 import org.jsoup.Jsoup;
@@ -47,20 +47,20 @@ public class MeteoradarUtil {
         this.drawVillageOnMap = drawVillageOnMap;
     }
 
-    public String getMapWithVillage(String fileName) throws IOException, InvalidUrlException, NoDataOnTheSiteException {
+    public String getMapWithVillage(String fileName) throws IOException, InvalidUrlException, NoDataOnSiteException {
         String mapInRootProject = getPathToFileInRootProject(getImageFromUrl(), fileName);
         drawVillageOnMap.mapWithVillage(mapInRootProject);
         return fileName;
     }
 
-    public String getImageFromUrl() throws IOException, InvalidUrlException, NoDataOnTheSiteException {
+    public String getImageFromUrl() throws IOException, InvalidUrlException, NoDataOnSiteException {
         Document doc = Jsoup.connect(urlSetting.getUrlMainPageMeteoinfo()).get();
         Element tableElement;
 
         //table existence check
         if (!doc.select(TABLE).isEmpty() && doc.select(TABLE).size() >= 3) {
             tableElement = doc.select(TABLE).get(2); //select the third TABLE.
-        } else throw new NoDataOnTheSiteException(EXCEPTION_MESSAGE);
+        } else throw new NoDataOnSiteException("Missing data on the site");
         Elements rows = tableElement.select("tr");
 
         title = rows.get(0).getElementsByTag("img").get(0).attr("title");
@@ -115,7 +115,7 @@ public class MeteoradarUtil {
     }
 
     //make sure that there is a correct ending минут\минуты\минута час\часа\часов
-    public String correctEndingInTime(long hours, long minutes, String prettyFormat) {
+    private String correctEndingInTime(long hours, long minutes, String prettyFormat) {
 
         if (hours == 0 && minutes >= 0) {
             //now or 15 minutes ago

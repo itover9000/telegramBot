@@ -47,7 +47,7 @@ public class GeomagneticStormUtil {
 
     // check storm every 15 minutes, if kpIndex > 4, then will be sent message to email
     @Scheduled(fixedRate = 15 * 1000 * 1000)
-    public void checkStormEvery3Hour() {
+    public void checkStormEvery15Minutes() {
         check(stormModel);
     }
 

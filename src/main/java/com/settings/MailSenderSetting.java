@@ -8,9 +8,8 @@ import org.springframework.stereotype.Component;
 @Data
 @ConfigurationProperties("spring.mail")
 public class MailSenderSetting {
-
     private String host;
-    private String username;
+    private String emailSender;
     private String password;
     private int port;
     private String protocol;

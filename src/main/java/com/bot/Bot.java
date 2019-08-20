@@ -1,8 +1,7 @@
 package com.bot;
 
 import com.exception.InvalidUrlException;
-import com.exception.NoDataOnTheSiteException;
-import com.model.BoredModel;
+import com.exception.NoDataOnSiteException;
 import com.service.BoredApi;
 import com.service.Currency;
 import com.service.GeomagneticStorm;
@@ -20,7 +19,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -34,12 +32,11 @@ import java.util.List;
 public class Bot extends TelegramLongPollingBot {
     private static final Logger logger = LogManager.getLogger(Bot.class);
     private static final String MESSAGE_LOGGER = "An exception occurred!";
-    private static final String MESSAGE_ANSWER= "что-то пошло не так";
+    private static final String MESSAGE_ANSWER = "Не удалось получить данные";
 
     private final MeteoradarUtil meteoradarUtil;
 
     private final BotSetting botSetting;
-    private final BoredModel boredModel;
     private final GeomagneticStorm geomagneticStorm;
     private final BoredApi boredApi;
     private final Currency currency;
@@ -48,9 +45,8 @@ public class Bot extends TelegramLongPollingBot {
 
 
     @Autowired
-    public Bot(BoredModel boredModel, GeomagneticStorm geomagneticStorm, BoredApi boredApi,
-               Currency currency, BotSetting botSetting, MeteoradarUtil meteoradarUtil, UrlSetting urlSetting) {
-        this.boredModel = boredModel;
+    public Bot(GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency,
+               BotSetting botSetting, MeteoradarUtil meteoradarUtil, UrlSetting urlSetting) {
         this.geomagneticStorm = geomagneticStorm;
         this.boredApi = boredApi;
         this.currency = currency;
@@ -67,7 +63,6 @@ public class Bot extends TelegramLongPollingBot {
                 case "магн. буря":
                     try {
                         sendMsg(message, geomagneticStorm.getGeomagneticStorm());
-
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(MESSAGE_LOGGER, e);
@@ -83,11 +78,8 @@ public class Bot extends TelegramLongPollingBot {
 
                         //picture time message
                         sendMsg(message, "погода " + meteoradarUtil.getTimeFromSiteWithNewTime(meteoradarUtil.getTitle()));
-                    } catch (TelegramApiException | IOException | ParseException e) {
-                        sendMsg(message, "Данные на сайте недоступны");
-                        logger.error(MESSAGE_LOGGER, e);
-                    } catch (InvalidUrlException | NoDataOnTheSiteException e) {
-                        sendMsg(message, "Сайт не предоставил данные");
+                    } catch (TelegramApiException | IOException | ParseException | InvalidUrlException | NoDataOnSiteException e) {
+                        sendMsg(message, MESSAGE_ANSWER);
                         logger.error(MESSAGE_LOGGER, e);
                     }
                     break;
@@ -98,23 +90,24 @@ public class Bot extends TelegramLongPollingBot {
                         execute(new SendVideo()
                                 .setVideo(new File(
                                         meteoradarUtil.getPathToFileInRootProject(
-                                                urlSetting.getUrlToGifFile(), urlSetting.getGifFileNameFromMeteoinfo())))
+                                                urlSetting.getUrlToGifFile(),
+                                                urlSetting.getGifFileNameFromMeteoinfo())))
                                 .setChatId(message.getChatId().toString()));
-                    } catch (TelegramApiException e) {
+                    } catch (TelegramApiException | IOException | InvalidUrlException e) {
                         sendMsg(message, MESSAGE_ANSWER);
-                    } catch (IOException | InvalidUrlException e) {
-                        sendMsg(message, "Данные на сайте недоступны");
                         logger.error(MESSAGE_LOGGER, e);
                     }
                     break;
+
                 case "скучно!":
                     try {
-                        sendMsg(message, boredApi.getBoredStringFormat(boredModel));
+                        sendMsg(message, boredApi.getBoredStringFormat());
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(MESSAGE_LOGGER, e);
                     }
                     break;
+
                 case "курс валют":
                     try {
                         sendMsg(message, currency.getCurrency());
@@ -125,8 +118,7 @@ public class Bot extends TelegramLongPollingBot {
                     break;
 
                 default:
-                        sendMsg(message, ".");
-
+                    sendMsg(message, "Неизвестная команда");
             }
         }
     }
@@ -141,13 +133,13 @@ public class Bot extends TelegramLongPollingBot {
         try {
             setButton(sendMessage);
             execute(sendMessage);
-
         } catch (TelegramApiException e) {
             logger.error(MESSAGE_LOGGER, e);
         }
     }
 
     private void setButton(SendMessage message) {
+        // button size settings
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         message.setReplyMarkup(keyboardMarkup);
         keyboardMarkup.setSelective(true);
@@ -155,20 +147,15 @@ public class Bot extends TelegramLongPollingBot {
         keyboardMarkup.setOneTimeKeyboard(false);
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
-        KeyboardRow keyboardSecondRow = new KeyboardRow();
 
-        keyboardFirstRow.add(new KeyboardButton("магн. буря"));
-        keyboardFirstRow.add(new KeyboardButton("скучно!"));
-        keyboardFirstRow.add(new KeyboardButton("курс валют"));
-        keyboardSecondRow.add(new KeyboardButton("текущая погода"));
-        keyboardSecondRow.add(new KeyboardButton("анимация погоды"));
+        //add in keyboardRows rows buttons from yaml
+        botSetting.getButtons().forEach((key, values) -> {
+            KeyboardRow keyboardRow = new KeyboardRow();
+            keyboardRow.addAll(values);
+            keyboardRows.add(keyboardRow);
+        });
 
-        keyboardRows.add(keyboardFirstRow);
-        keyboardRows.add(keyboardSecondRow);
         keyboardMarkup.setKeyboard(keyboardRows);
-
-
     }
 
     public String getBotUsername() {

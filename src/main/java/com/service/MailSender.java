@@ -2,6 +2,7 @@ package com.service;
 
 import com.settings.MailSenderSetting;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class MailSender {
 
     @Autowired
+    @Qualifier("getMailSender")
     private JavaMailSender javaMailSender;
 
     @Autowired
@@ -18,7 +20,7 @@ public class MailSender {
     public void send(String emailTo, String subject, String message) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        mailMessage.setFrom(mailSenderSetting.getUsername());
+        mailMessage.setFrom(mailSenderSetting.getEmailSender());
         mailMessage.setTo(emailTo);
         mailMessage.setSubject(subject);
         mailMessage.setText(message);

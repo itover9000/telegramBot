@@ -1,6 +1,5 @@
 package com.util;
 
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,12 +12,6 @@ import java.util.Scanner;
 public class ReadJSONUtil {
 
     private ReadJSONUtil() {
-    }
-
-    public static JSONObject readJSONFromUrl(URL url) throws IOException {
-        String result = getJSONStringFormat(url);
-
-        return new JSONObject(result);
     }
 
     //return json on String format

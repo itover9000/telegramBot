@@ -34,7 +34,7 @@ public class BoredApiTest {
 //        boredApi = new BoredApi(urlSetting);
 
         //прочитали json из ресурсов, достали название мероприятия, количество участников и перевели
-        String boredStringFormat = boredApi.getBoredStringFormat(model);
+        String boredStringFormat = boredApi.getBoredStringFormat();
 
         assertEquals(boredStringFormat, "Мероприятие: Фотосессия с друзьями\n" +
                 "Activity:  Have a photo session with some friends\n" +

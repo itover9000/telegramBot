@@ -6,7 +6,6 @@ import com.model.YandexModel;
 import com.settings.YandexSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;

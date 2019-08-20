@@ -1,6 +1,14 @@
 bot:
   token: 884639123:AAGJUFOWF9hoyk4_qM7vNw3YFYHXpsxVAMA
   username: itover9000_bot
+  buttons:
+    firstRow:
+      - магн. буря
+      - скучно!
+      - курс валют
+    secondRow:
+      - текущая погода
+      - анимация погоды
 
 url:
   urlMainPageMeteoinfo: http://www.meteoinfo.by/radar/?q=UMMN&t=0
@@ -26,7 +34,7 @@ currency:
 spring:
   mail:
     host: smtp.yandex.ru
-    username: h.dabravolskay@yandex.ru
+    emailSender: h.dabravolskay@yandex.ru
     password: tratata88
     port: 465
     protocol: smtps
