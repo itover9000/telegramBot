@@ -1,13 +1,11 @@
 package com.util;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.model.YandexModel;
 import com.settings.YandexSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URL;
 
 @Service
@@ -15,6 +13,9 @@ public class YandexTranslateUtil {
 
     @Autowired
     private YandexSettings yandexSettings;
+
+    @Autowired
+    private TransformObjectFromJson<YandexModel> transformObjectFromJson;
 
     public String translateFromEngToRu(String text) throws IOException {
 
@@ -28,23 +29,15 @@ public class YandexTranslateUtil {
                 .append(textWithSpacesReplaced)
                 .append("&lang=en-ru");
 
+        URL url = new URL(fullUrl.toString());
 
-        URL urlObj = new URL(String.valueOf(fullUrl));
-
-        String jsonStringFormat = ReadJSONUtil.getJSONStringFormat(urlObj);
-
-        Gson gson = new Gson();
-        Type collectionType = new TypeToken<YandexModel>() {
-        }.getType();
-        // get the object from json
-        YandexModel yandexModel = gson.fromJson(jsonStringFormat, collectionType);
-
+        //transform json to yandexModel
+        YandexModel yandexModelFromJson = transformObjectFromJson.getObjectFromJson(url, YandexModel.class);
 
         StringBuilder translate = new StringBuilder();
-        if (yandexModel.getCode() == 200) {
-            yandexModel.getText().forEach(translate::append);
+        if (yandexModelFromJson != null && yandexModelFromJson.getCode() == 200) {
+            yandexModelFromJson.getText().forEach(translate::append);
             return translate.toString();
         } else return "Не удалось получить данные";
     }
-
 }

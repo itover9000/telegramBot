@@ -1,7 +1,7 @@
 package com.util;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.exception.InvalidDataFormatException;
+import com.exception.NoDataOnSiteException;
 import com.model.GeomagneticStormModel;
 import com.service.GeomagneticStorm;
 import com.service.MailSender;
@@ -14,9 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URL;
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -28,6 +26,9 @@ public class GeomagneticStormUtil {
     private MailSenderSetting emailSetting;
 
     @Autowired
+    private TransformObjectFromJson<GeomagneticStormModel> transformObjectFromJson;
+
+    @Autowired
     private UrlSetting urlSetting;
 
     @Autowired
@@ -35,23 +36,20 @@ public class GeomagneticStormUtil {
 
     private final GeomagneticStorm geomagneticStorm;
 
-    private final GeomagneticStormModel stormModel;
-
-    private boolean startStorm;
+    private boolean isStorm;
 
     @Autowired
-    public GeomagneticStormUtil(GeomagneticStorm geomagneticStorm, GeomagneticStormModel stormModel) {
+    public GeomagneticStormUtil(GeomagneticStorm geomagneticStorm) {
         this.geomagneticStorm = geomagneticStorm;
-        this.stormModel = stormModel;
     }
 
     // check storm every 15 minutes, if kpIndex > 4, then will be sent message to email
     @Scheduled(fixedRate = 15 * 1000 * 1000)
     public void checkStormEvery15Minutes() {
-        check(stormModel);
+        check();
     }
 
-    private void check(GeomagneticStormModel stormModel) {
+    private void check() {
 
         StringBuilder description = new StringBuilder()
                 .append("\nКачественно состояние магнитного поля в зависимости от Кp индекса\n")
@@ -62,39 +60,32 @@ public class GeomagneticStormUtil {
                 .append("Kp >= 7 — сильная магнитная буря.");
 
         try {
-            GeomagneticStormModel stormModelForCheck = getStormModel(stormModel);
+            GeomagneticStormModel stormModelForCheck = getStormModel();
             if (stormModelForCheck.getKpIndex() > 4) {
-                startStorm = true;
+                isStorm = true;
                 String storm = geomagneticStorm.getGeomagneticStorm();
                 mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря!", storm + description);
-            } else if (startStorm && stormModelForCheck.getKpIndex() < 4) {
-                startStorm = false;
+            } else if (isStorm && stormModelForCheck.getKpIndex() < 4) {
+                isStorm = false;
                 String storm = geomagneticStorm.getGeomagneticStorm();
                 mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря закончилась", storm);
             }
-        } catch (IOException e) {
-           logger.error(MESSAGE_LOGGER, e);
+        } catch (IOException | NoDataOnSiteException | InvalidDataFormatException e) {
+            logger.error(MESSAGE_LOGGER, e);
         }
     }
 
-    private GeomagneticStormModel getStormModel(GeomagneticStormModel stormModel) throws IOException {
+    public GeomagneticStormModel getStormModel() throws IOException, NoDataOnSiteException {
         URL url = new URL(urlSetting.getUrlToGeomagneticSite());
-        String jsonStringFormat = ReadJSONUtil.getJSONStringFormat(url);
 
-        if (!jsonStringFormat.isEmpty()) {
-            Gson gson =new Gson();
+        List<GeomagneticStormModel> listStormModelFromJson = transformObjectFromJson.getListObjectsFromJson(url, GeomagneticStormModel.class);
 
-            Type collectionType = new TypeToken<Collection<GeomagneticStormModel>>() {
-            }.getType();
-            // get the List<GeomagneticStormModel> from json
-            List<GeomagneticStormModel> listStormModel = gson.fromJson(jsonStringFormat, collectionType);
-
+        GeomagneticStormModel stormModelFromJson = listStormModelFromJson.stream().reduce((first, second) -> second).orElse(null);
+        if (stormModelFromJson != null) {
             //return last kpIndex
-            if (!listStormModel.isEmpty()) {
-                stormModel = listStormModel.get(listStormModel.size() - 1);
-                return stormModel;
-            }
-        }
-        return stormModel;
+            return stormModelFromJson;
+        } else throw new NoDataOnSiteException(MESSAGE_LOGGER);
     }
+
+
 }

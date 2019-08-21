@@ -1,5 +1,6 @@
 package com.bot;
 
+import com.exception.InvalidDataFormatException;
 import com.exception.InvalidUrlException;
 import com.exception.NoDataOnSiteException;
 import com.service.BoredApi;
@@ -31,7 +32,7 @@ import java.util.List;
 @Component
 public class Bot extends TelegramLongPollingBot {
     private static final Logger logger = LogManager.getLogger(Bot.class);
-    private static final String MESSAGE_LOGGER = "An exception occurred!";
+    private static final String ERROR_MESSAGE = "An exception occurred!";
     private static final String MESSAGE_ANSWER = "Не удалось получить данные";
 
     private final MeteoradarUtil meteoradarUtil;
@@ -63,9 +64,12 @@ public class Bot extends TelegramLongPollingBot {
                 case "магн. буря":
                     try {
                         sendMsg(message, geomagneticStorm.getGeomagneticStorm());
-                    } catch (IOException e) {
+                    } catch (IOException | NoDataOnSiteException e) {
                         sendMsg(message, MESSAGE_ANSWER);
-                        logger.error(MESSAGE_LOGGER, e);
+                        logger.error(ERROR_MESSAGE, e);
+                    } catch (InvalidDataFormatException e) {
+                        sendMsg(message, "Неверный формат данных");
+                        logger.error(ERROR_MESSAGE, e);
                     }
                     break;
 
@@ -80,7 +84,7 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, "погода " + meteoradarUtil.getTimeFromSiteWithNewTime(meteoradarUtil.getTitle()));
                     } catch (TelegramApiException | IOException | ParseException | InvalidUrlException | NoDataOnSiteException e) {
                         sendMsg(message, MESSAGE_ANSWER);
-                        logger.error(MESSAGE_LOGGER, e);
+                        logger.error(ERROR_MESSAGE, e);
                     }
                     break;
 
@@ -95,7 +99,7 @@ public class Bot extends TelegramLongPollingBot {
                                 .setChatId(message.getChatId().toString()));
                     } catch (TelegramApiException | IOException | InvalidUrlException e) {
                         sendMsg(message, MESSAGE_ANSWER);
-                        logger.error(MESSAGE_LOGGER, e);
+                        logger.error(ERROR_MESSAGE, e);
                     }
                     break;
 
@@ -104,7 +108,7 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, boredApi.getBoredStringFormat());
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
-                        logger.error(MESSAGE_LOGGER, e);
+                        logger.error(ERROR_MESSAGE, e);
                     }
                     break;
 
@@ -113,7 +117,7 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, currency.getCurrency());
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
-                        logger.error(MESSAGE_LOGGER, e);
+                        logger.error(ERROR_MESSAGE, e);
                     }
                     break;
 
@@ -130,11 +134,11 @@ public class Bot extends TelegramLongPollingBot {
         sendMessage.setReplyToMessageId(message.getMessageId());
         sendMessage.setText(text);
 
+        setButton(sendMessage);
         try {
-            setButton(sendMessage);
             execute(sendMessage);
         } catch (TelegramApiException e) {
-            logger.error(MESSAGE_LOGGER, e);
+            logger.error(ERROR_MESSAGE, e);
         }
     }
 

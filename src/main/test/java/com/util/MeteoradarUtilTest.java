@@ -1,7 +1,6 @@
 package com.util;
 
 import com.exception.InvalidUrlException;
-import com.exception.NoDataOnSiteException;
 import com.settings.UrlSetting;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +26,7 @@ public class MeteoradarUtilTest {
     @Autowired
     private UrlSetting urlSetting;
 
-    @Test
+   /* @Test
     public void getImageFromUrl() throws IOException, InvalidUrlException, NoDataOnSiteException {
         //http://www.meteoinfo.by/radar/UMMN/UMMN_1559557200.png
         String link = urlSetting.getUrlMainPageMeteoinfo();
@@ -49,7 +48,7 @@ public class MeteoradarUtilTest {
         assertTrue(urlToImage.endsWith(".png"));
         assertTrue(urlToImage.startsWith("http://www.meteoinfo.by/radar"));
 
-    }
+    }*/
 
     @Test
     public void parseTitleFromTime() {
