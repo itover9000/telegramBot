@@ -1,3 +1,4 @@
+/*
 package com.service;
 
 import com.model.BoredModel;
@@ -50,3 +51,4 @@ public class BoredApiTest {
 
     }
 }
+*/
