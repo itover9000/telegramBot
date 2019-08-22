@@ -1,24 +1,26 @@
 package com.util;
 
 import com.exception.InvalidUrlException;
+import com.exception.NoDataOnSiteException;
 import com.settings.UrlSetting;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.gen5.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.gen5.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class MeteoradarUtilTest {
+class MeteoradarUtilTest {
 
     @Autowired
     private MeteoradarUtil meteoradarUtil;
@@ -26,7 +28,7 @@ public class MeteoradarUtilTest {
     @Autowired
     private UrlSetting urlSetting;
 
-   /* @Test
+      @Test
     public void getImageFromUrl() throws IOException, InvalidUrlException, NoDataOnSiteException {
         //http://www.meteoinfo.by/radar/UMMN/UMMN_1559557200.png
         String link = urlSetting.getUrlMainPageMeteoinfo();
@@ -48,13 +50,14 @@ public class MeteoradarUtilTest {
         assertTrue(urlToImage.endsWith(".png"));
         assertTrue(urlToImage.startsWith("http://www.meteoinfo.by/radar"));
 
-    }*/
+    }
 
     @Test
     public void parseTitleFromTime() {
         String title = "Метеорадар UMMN.Радиолокационная карта метеоявлений. Дата и время формирования карты: 03.06 в 10:00 UTC.";
         String timeFormatHHmm = meteoradarUtil.parseTitleForGettingTime(title);
-        assertEquals( "10:00", timeFormatHHmm);
+
+        assertEquals("10:00", timeFormatHHmm);
     }
 
     @Test
@@ -64,13 +67,13 @@ public class MeteoradarUtilTest {
         URL linkToImage = new URL(urlSetting.getUrlToGifFile());
         HttpURLConnection urlToImagePng = (HttpURLConnection) linkToImage.openConnection();
         int responseCodeImage = urlToImagePng.getResponseCode();
-        assertEquals( 200, responseCodeImage);
+        Assertions.assertEquals(200, responseCodeImage);
 
         String pathToGifFile = meteoradarUtil
                 .getPathToFileInRootProject(urlSetting.getUrlToGifFile(), urlSetting.getGifFileNameFromMeteoinfo());
         File file = new File(pathToGifFile);
         assertTrue(file.exists());
-        assertEquals(pathToGifFile, urlSetting.getGifFileNameFromMeteoinfo());
+        Assertions.assertEquals(pathToGifFile, urlSetting.getGifFileNameFromMeteoinfo());
         assertTrue(file.length() > 3000);
     }
 }
