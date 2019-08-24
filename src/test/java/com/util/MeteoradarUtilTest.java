@@ -3,6 +3,8 @@ package com.util;
 import com.exception.InvalidUrlException;
 import com.settings.UrlSetting;
 import org.junit.gen5.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,40 +29,44 @@ class MeteoradarUtilTest {
     @Autowired
     private UrlSetting urlSetting;
 
-//      @Test
-//    public void getImageFromUrl() throws IOException, InvalidUrlException, NoDataOnSiteException {
-//        //http://www.meteoinfo.by/radar/UMMN/UMMN_1559557200.png
-//        String link = urlSetting.getUrlMainPageMeteoinfo();
-//
-//        //link availability check (code 200) "http://www.meteoinfo.by/radar/?q=UMMN&t=0";
-//        URL url = new URL(link);
-//        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-//        int responseCode = urlConnection.getResponseCode();
-//        assertEquals(200, responseCode);
-//
-//        //link availability check (code 200) http://www.meteoinfo.by/radar/UMMN/UMMN_1559557200.png
-//        String urlToImage = meteoradarUtil.getImageFromUrl();
-//        URL linkToImage = new URL(link);
-//        HttpURLConnection urlToImagePng = (HttpURLConnection) linkToImage.openConnection();
-//        int responseCodeImage = urlToImagePng.getResponseCode();
-//        assertEquals(200, responseCodeImage);
-//
-//        //checking the correctness of the returned link
-//        assertTrue(urlToImage.endsWith(".png"));
-//        assertTrue(urlToImage.startsWith("http://www.meteoinfo.by/radar"));
-//
-//    }
+    private String title;
 
-    @Test
-    public void parseTitleFromTime() {
-        String title = "Метеорадар UMMN.Радиолокационная карта метеоявлений. Дата и время формирования карты: 03.06 в 10:00 UTC.";
-        String timeFormatHHmm = meteoradarUtil.parseTitleForGettingTime(title);
+    // For technical reasons, the radar does not work, because this test now will be failed
+   /* @Test
+    void getImageFromUrl() throws IOException, InvalidUrlException, NoDataOnSiteException {
+        //http://www.meteoinfo.by/radar/UMMN/UMMN_1559557200.png
+        String link = urlSetting.getUrlMainPageMeteoinfo();
 
-        assertEquals("10:00", timeFormatHHmm);
+        //link availability check (code 200) "http://www.meteoinfo.by/radar/?q=UMMN&t=0";
+        URL url = new URL(link);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        int responseCode = urlConnection.getResponseCode();
+        assertEquals(200, responseCode);
+
+        //link availability check (code 200) http://www.meteoinfo.by/radar/UMMN/UMMN_1559557200.png
+        String urlToImage = meteoradarUtil.getImageFromUrl();
+        URL linkToImage = new URL(link);
+        HttpURLConnection urlToImagePng = (HttpURLConnection) linkToImage.openConnection();
+        int responseCodeImage = urlToImagePng.getResponseCode();
+        assertEquals(200, responseCodeImage);
+
+        //checking the correctness of the returned link
+        assertTrue(urlToImage.endsWith(".png"));
+        assertTrue(urlToImage.startsWith("http://www.meteoinfo.by/radar"));
+    }*/
+
+    @BeforeEach
+    void setUp() {
+        title = "Метеорадар UMMN.Радиолокационная карта метеоявлений. Дата и время формирования карты: 03.06 в 10:00 UTC.";
+    }
+
+    @AfterEach
+    void tearDown() {
+        title = null;
     }
 
     @Test
-    public void getPathToGifFile() throws IOException, InvalidUrlException {
+    void getPathToFileInRootProject() throws IOException, InvalidUrlException {
 
         //link availability check (code 200) "http://www.meteoinfo.by/radar/UMMN/radar-map.gif"
         URL linkToImage = new URL(urlSetting.getUrlToGifFile());
@@ -68,11 +74,24 @@ class MeteoradarUtilTest {
         int responseCodeImage = urlToImagePng.getResponseCode();
         Assertions.assertEquals(200, responseCodeImage);
 
-        String pathToGifFile = meteoradarUtil
-                .getPathToFileInRootProject(urlSetting.getUrlToGifFile(), urlSetting.getGifFileNameFromMeteoinfo());
+        String pathToGifFile = meteoradarUtil.getPathToFileInRootProject(
+                urlSetting.getUrlToGifFile(),
+                urlSetting.getGifFileNameFromMeteoinfo());
         File file = new File(pathToGifFile);
         assertTrue(file.exists());
-        Assertions.assertEquals(pathToGifFile, urlSetting.getGifFileNameFromMeteoinfo());
+        assertEquals(pathToGifFile, urlSetting.getGifFileNameFromMeteoinfo());
         assertTrue(file.length() > 3000);
+    }
+
+    @Test
+    void parseTitleForGettingTime() {
+        String timeFormatHHmm = meteoradarUtil.parseTitleForGettingTime(title);
+        assertEquals("10:00", timeFormatHHmm);
+    }
+
+    @Test
+    void parseTitleForGettingDate() {
+        String dateTime = meteoradarUtil.parseTitleForGettingDate(title);
+        assertEquals("03.06", dateTime);
     }
 }

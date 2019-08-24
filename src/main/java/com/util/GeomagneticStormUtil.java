@@ -60,14 +60,14 @@ public class GeomagneticStormUtil {
                 .append("Kp >= 7 — сильная магнитная буря.");
 
         try {
-            GeomagneticStormModel stormModelForCheck = getStormModel();
+            GeomagneticStormModel stormModelForCheck = getStormModel(urlSetting.getUrlToGeomagneticSite());
             if (stormModelForCheck.getKpIndex() > 4) {
                 isStorm = true;
-                String storm = geomagneticStorm.getGeomagneticStorm();
+                String storm = geomagneticStorm.getGeomagneticStorm(urlSetting.getUrlToGeomagneticSite());
                 mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря!", storm + description);
             } else if (isStorm && stormModelForCheck.getKpIndex() < 4) {
                 isStorm = false;
-                String storm = geomagneticStorm.getGeomagneticStorm();
+                String storm = geomagneticStorm.getGeomagneticStorm(urlSetting.getUrlToGeomagneticSite());
                 mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря закончилась", storm);
             }
         } catch (IOException | NoDataOnSiteException | InvalidDataFormatException e) {
@@ -75,8 +75,8 @@ public class GeomagneticStormUtil {
         }
     }
 
-    public GeomagneticStormModel getStormModel() throws IOException, NoDataOnSiteException {
-        URL url = new URL(urlSetting.getUrlToGeomagneticSite());
+    public GeomagneticStormModel getStormModel(String stringUrl) throws IOException, NoDataOnSiteException {
+        URL url = new URL(stringUrl);
 
         List<GeomagneticStormModel> listStormModelFromJson = transformObjectFromJson.getListObjectsFromJson(url, GeomagneticStormModel.class);
 

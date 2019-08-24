@@ -7,6 +7,7 @@ import com.service.BoredApi;
 import com.service.Currency;
 import com.service.GeomagneticStorm;
 import com.settings.BotSetting;
+import com.settings.CurrencySetting;
 import com.settings.UrlSetting;
 import com.util.MeteoradarUtil;
 import org.apache.logging.log4j.LogManager;
@@ -36,24 +37,24 @@ public class Bot extends TelegramLongPollingBot {
     private static final String MESSAGE_ANSWER = "Не удалось получить данные";
 
     private final MeteoradarUtil meteoradarUtil;
-
     private final BotSetting botSetting;
     private final GeomagneticStorm geomagneticStorm;
     private final BoredApi boredApi;
     private final Currency currency;
-
     private final UrlSetting urlSetting;
+    private final CurrencySetting currencySetting;
 
 
     @Autowired
     public Bot(GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency,
-               BotSetting botSetting, MeteoradarUtil meteoradarUtil, UrlSetting urlSetting) {
+               BotSetting botSetting, MeteoradarUtil meteoradarUtil, UrlSetting urlSetting, CurrencySetting currencySetting) {
         this.geomagneticStorm = geomagneticStorm;
         this.boredApi = boredApi;
         this.currency = currency;
         this.botSetting = botSetting;
         this.meteoradarUtil = meteoradarUtil;
         this.urlSetting = urlSetting;
+        this.currencySetting = currencySetting;
     }
 
     public void onUpdateReceived(Update update) {
@@ -63,7 +64,7 @@ public class Bot extends TelegramLongPollingBot {
             switch (message.getText().toLowerCase().strip()) {
                 case "магн. буря" ->{
                     try {
-                        sendMsg(message, geomagneticStorm.getGeomagneticStorm());
+                        sendMsg(message, geomagneticStorm.getGeomagneticStorm(urlSetting.getUrlToGeomagneticSite()));
                     } catch (IOException | NoDataOnSiteException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
@@ -102,7 +103,7 @@ public class Bot extends TelegramLongPollingBot {
                 }
                 case "скучно!" ->{
                     try {
-                        sendMsg(message, boredApi.getBoredStringFormat());
+                        sendMsg(message, boredApi.getBoredStringFormat(urlSetting.getUrlToBoredapi()));
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
@@ -110,7 +111,7 @@ public class Bot extends TelegramLongPollingBot {
                 }
                 case "курс валют" ->{
                     try {
-                        sendMsg(message, currency.getCurrency());
+                        sendMsg(message, currency.getCurrency(currencySetting.getUrlApi()));
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);

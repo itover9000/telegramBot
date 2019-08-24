@@ -3,9 +3,7 @@ package com.service;
 import com.exception.InvalidDataFormatException;
 import com.exception.NoDataOnSiteException;
 import com.model.GeomagneticStormModel;
-import com.settings.UrlSetting;
 import com.util.GeomagneticStormUtil;
-import com.util.TransformObjectFromJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +21,6 @@ import java.util.TimeZone;
 public class GeomagneticStorm {
     private static final Logger logger = LogManager.getLogger(GeomagneticStorm.class);
     private static final String ERROR_MESSAGE = "An exception occurred!";
-
-    @Autowired
-    private TransformObjectFromJson<GeomagneticStormModel> transformObjectFromJson;
-
-    @Autowired
-    private UrlSetting urlSetting;
 
     @Autowired
     private GeomagneticStormUtil geomagneticStormUtil;
@@ -53,8 +45,8 @@ public class GeomagneticStorm {
         return format.toLocalizedPattern();
     }
 
-    public String getGeomagneticStorm() throws IOException, InvalidDataFormatException, NoDataOnSiteException {
-        GeomagneticStormModel stormModelLastElement = geomagneticStormUtil.getStormModel();
+    public String getGeomagneticStorm(String stringUrl) throws IOException, InvalidDataFormatException, NoDataOnSiteException {
+        GeomagneticStormModel stormModelLastElement = geomagneticStormUtil.getStormModel(stringUrl);
         if (stormModelLastElement != null) {
             //check last kpIndex in List
             StringBuilder returnText = new StringBuilder()

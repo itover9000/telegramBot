@@ -21,7 +21,7 @@ public class Currency {
     @Autowired
     private TransformObjectFromJson<CurrencyModel> transformObjectFromJson;
 
-    public String getCurrency() throws IOException {
+    public String getCurrency(String stringUrl) throws IOException {
         List<Integer> currencyList = currencySetting.getListCurrencies();
 
         //get current date in format "dd.MM.yyyy"
@@ -32,7 +32,7 @@ public class Currency {
         StringBuilder finalMessage = new StringBuilder("Курс валют на " + currentDate + "\n");
 
         for (Integer idCurrency : currencyList) {
-            URL url = new URL(currencySetting.getUrlApi() + idCurrency);
+            URL url = new URL(stringUrl + idCurrency);
 
             CurrencyModel currencyModelFromJson = transformObjectFromJson.getObjectFromJson(url, CurrencyModel.class);
 

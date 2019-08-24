@@ -1,7 +1,6 @@
 package com.service;
 
 import com.model.BoredModel;
-import com.settings.UrlSetting;
 import com.util.TransformObjectFromJson;
 import com.util.YandexTranslateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import java.net.URL;
 
 @Service
 public class BoredApi {
-    private final UrlSetting urlSetting;
 
     @Autowired
     private YandexTranslateUtil yandexTranslateUtil;
@@ -20,13 +18,8 @@ public class BoredApi {
     @Autowired
     private TransformObjectFromJson<BoredModel> transformObjectFromJson;
 
-    @Autowired
-    public BoredApi(UrlSetting urlSetting) {
-        this.urlSetting = urlSetting;
-    }
-
-    public String getBoredStringFormat() throws IOException {
-        URL url = new URL(urlSetting.getUrlToBoredapi());
+    public String getBoredStringFormat(String stringUrl) throws IOException {
+        URL url = new URL(stringUrl);
         BoredModel boredModel = transformObjectFromJson.getObjectFromJson(url, BoredModel.class);
 
         StringBuilder answer = new StringBuilder()

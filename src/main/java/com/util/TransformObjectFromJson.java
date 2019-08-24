@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
 
@@ -16,7 +17,7 @@ public class TransformObjectFromJson<T> {
 
     //return json on String format
     private String getJSONStringFormat(URL url) throws IOException {
-        Scanner in = new Scanner((InputStream) url.getContent());
+        Scanner in = new Scanner((InputStream) url.getContent(), StandardCharsets.UTF_8);
         StringBuilder result = new StringBuilder();
         while (in.hasNext()) {
             result.append(in.nextLine());

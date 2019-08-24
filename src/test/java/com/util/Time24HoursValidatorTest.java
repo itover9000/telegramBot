@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class Time24HoursValidatorTest {
+class Time24HoursValidatorTest {
 
     @Autowired
     private Time24HoursValidator validator;
 
     @Test
-    public void isValidateTime24() {
+    void isValidateTime24() {
 
         assertTrue(validator.isValidateTime24("00:00"));
         assertTrue(validator.isValidateTime24("0:00"));
@@ -34,7 +34,7 @@ public class Time24HoursValidatorTest {
 
 
     @Test
-    public void isValidateDate() {
+    void isValidateDate() {
 
         assertTrue(validator.isValidateDate("11.06"));
         assertTrue(validator.isValidateDate("01.01"));
