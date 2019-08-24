@@ -60,8 +60,8 @@ public class Bot extends TelegramLongPollingBot {
         Message message = update.getMessage();
 
         if (message != null && message.hasText()) {
-            switch (message.getText().toLowerCase().trim()) {
-                case "магн. буря":
+            switch (message.getText().toLowerCase().strip()) {
+                case "магн. буря" ->{
                     try {
                         sendMsg(message, geomagneticStorm.getGeomagneticStorm());
                     } catch (IOException | NoDataOnSiteException e) {
@@ -71,9 +71,8 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, "Неверный формат данных");
                         logger.error(ERROR_MESSAGE, e);
                     }
-                    break;
-
-                case "текущая погода":
+                }
+                case "текущая погода" ->{
                     try {
                         //send a picture from the site, mark the place on the map
                         execute(new SendPhoto()
@@ -86,9 +85,8 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
                     }
-                    break;
-
-                case "анимация погоды":
+                }
+                case "анимация погоды" ->{
                     try {
                         //send animation about the weather for the last 3 hours
                         execute(new SendVideo()
@@ -101,28 +99,24 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
                     }
-                    break;
-
-                case "скучно!":
+                }
+                case "скучно!" ->{
                     try {
                         sendMsg(message, boredApi.getBoredStringFormat());
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
                     }
-                    break;
-
-                case "курс валют":
+                }
+                case "курс валют" ->{
                     try {
                         sendMsg(message, currency.getCurrency());
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
                     }
-                    break;
-
-                default:
-                    sendMsg(message, "Неизвестная команда");
+                }
+                default ->sendMsg(message, "Неизвестная команда");
             }
         }
     }
