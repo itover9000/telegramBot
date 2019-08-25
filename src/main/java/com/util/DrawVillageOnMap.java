@@ -1,5 +1,7 @@
 package com.util;
 
+import com.settings.DrawVillageSetting;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -10,28 +12,12 @@ import java.io.IOException;
 
 @Component
 public class DrawVillageOnMap {
+    private static final Font FONT = new Font("TimesRoman", Font.PLAIN, 9);
 
-    private int x;
-    private int y;
-    private int width;
-    private int height;
-    private String message;
+    @Autowired
+    private DrawVillageSetting villageSetting;
 
-    public DrawVillageOnMap() {
-        this.x = 191;
-        this.y = 188;
-        this.width = 5;
-        this.height = 5;
-        this.message = "Мозоли";
-    }
-
-    public DrawVillageOnMap(int x, int y, int width, int height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-
+    // set the location of the village relative to the upper left corner
     public void mapWithVillage(String pathToMap) throws IOException {
         // Open picture file, load into a BufferedImage.
         BufferedImage img = ImageIO.read(new File(pathToMap));
@@ -40,12 +26,11 @@ public class DrawVillageOnMap {
         Graphics2D g = img.createGraphics();
 
         //set the mark on the map village
-        Font font = new Font("TimesRoman", Font.PLAIN, 9);
-        g.setFont(font);
+        g.setFont(FONT);
         g.setPaint(Color.BLACK);
-        g.drawOval(x, y, width, height);
+        g.drawOval(villageSetting.getX(), villageSetting.getY(), villageSetting.getWidth(), villageSetting.getHeight());
 
-        g.drawString(message, x - 13, y - 1);
+        g.drawString(villageSetting.getMessage(), villageSetting.getX() - 13, villageSetting.getY() - 1);
         ImageIO.write(img, "gif", new File(pathToMap));
 
         // Clean up -- dispose the graphics context that was created

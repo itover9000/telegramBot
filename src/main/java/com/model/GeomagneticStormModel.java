@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 public class GeomagneticStormModel {
     @SerializedName("time_tag")
     private String timeTag;
-
     @SerializedName("kp_index")
     private int kpIndex;
 }

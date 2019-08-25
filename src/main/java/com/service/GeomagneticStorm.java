@@ -1,51 +1,39 @@
 package com.service;
 
-import com.exception.InvalidDataFormatException;
 import com.exception.NoDataOnSiteException;
 import com.model.GeomagneticStormModel;
 import com.util.GeomagneticStormUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
 @Service
 public class GeomagneticStorm {
-    private static final Logger logger = LogManager.getLogger(GeomagneticStorm.class);
-    private static final String ERROR_MESSAGE = "An exception occurred!";
-
     @Autowired
     private GeomagneticStormUtil geomagneticStormUtil;
 
-    private String parseGeomagneticStorm(String dateForParse) throws InvalidDataFormatException {
-        //set pattern
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        Date result;
-        try {
-            result = df.parse(dateForParse);
-        } catch (ParseException e) {
-            logger.error(ERROR_MESSAGE, e);
-            throw new InvalidDataFormatException("Invalid data format");
-        }
-        // set new time pattern
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private String parseGeomagneticStorm(String dateForParse) {
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
-        //set TimeZone Minsk
-        sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Etc/GMT-6")));
-        SimpleDateFormat format = new SimpleDateFormat(sdf.format(result));
-
-        return format.toLocalizedPattern();
+        ZoneId zoneLocalMachine = ZoneId.of(TimeZone.getDefault().getDisplayName());
+        // get localDateTime from json
+        LocalDateTime localDateTime = LocalDateTime.parse(dateForParse, inputFormatter);
+        //transform localDateTime to zonedDateTime adjusted UTC
+        ZonedDateTime zonedDateTimeUtc = ZonedDateTime.of(localDateTime, ZoneOffset.UTC);
+        // get zonedDateTime relative to the local time zone
+        ZonedDateTime zonedDateTimeLocalMachine = zonedDateTimeUtc.withZoneSameInstant(zoneLocalMachine);
+        return zonedDateTimeLocalMachine.format(outputFormatter);
     }
 
-    public String getGeomagneticStorm(String stringUrl) throws IOException, InvalidDataFormatException, NoDataOnSiteException {
+    public String getGeomagneticStorm(String stringUrl) throws IOException, NoDataOnSiteException {
         GeomagneticStormModel stormModelLastElement = geomagneticStormUtil.getStormModel(stringUrl);
         if (stormModelLastElement != null) {
             //check last kpIndex in List

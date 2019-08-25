@@ -2,7 +2,6 @@ package com.service;
 
 import com.model.BoredModel;
 import com.util.TransformObjectFromJson;
-import com.util.YandexTranslateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,7 @@ import java.net.URL;
 public class BoredApi {
 
     @Autowired
-    private YandexTranslateUtil yandexTranslateUtil;
+    private YandexTranslate yandexTranslate;
 
     @Autowired
     private TransformObjectFromJson<BoredModel> transformObjectFromJson;
@@ -23,7 +22,7 @@ public class BoredApi {
         BoredModel boredModel = transformObjectFromJson.getObjectFromJson(url, BoredModel.class);
 
         StringBuilder answer = new StringBuilder()
-                .append("Мероприятие: ").append(yandexTranslateUtil.translateFromEngToRu(boredModel.getActivity())).append("\n")
+                .append("Мероприятие: ").append(yandexTranslate.translateFromEngToRu(boredModel.getActivity())).append("\n")
                 .append("Activity:  ").append(boredModel.getActivity()).append("\n")
                 .append("Количество участников: ").append(boredModel.getParticipants());
 

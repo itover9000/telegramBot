@@ -15,7 +15,6 @@ import java.util.Scanner;
 @Service
 public class TransformObjectFromJson<T> {
 
-    //return json on String format
     private String getJSONStringFormat(URL url) throws IOException {
         Scanner in = new Scanner((InputStream) url.getContent(), StandardCharsets.UTF_8);
         StringBuilder result = new StringBuilder();

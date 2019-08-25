@@ -9,7 +9,7 @@ import com.service.GeomagneticStorm;
 import com.settings.BotSetting;
 import com.settings.CurrencySetting;
 import com.settings.UrlSetting;
-import com.util.MeteoradarUtil;
+import com.util.WeatherSiteUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class Bot extends TelegramLongPollingBot {
     private static final String ERROR_MESSAGE = "An exception occurred!";
     private static final String MESSAGE_ANSWER = "Не удалось получить данные";
 
-    private final MeteoradarUtil meteoradarUtil;
+    private final WeatherSiteUtil weatherSiteUtil;
     private final BotSetting botSetting;
     private final GeomagneticStorm geomagneticStorm;
     private final BoredApi boredApi;
@@ -47,12 +47,12 @@ public class Bot extends TelegramLongPollingBot {
 
     @Autowired
     public Bot(GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency,
-               BotSetting botSetting, MeteoradarUtil meteoradarUtil, UrlSetting urlSetting, CurrencySetting currencySetting) {
+               BotSetting botSetting, WeatherSiteUtil weatherSiteUtil, UrlSetting urlSetting, CurrencySetting currencySetting) {
         this.geomagneticStorm = geomagneticStorm;
         this.boredApi = boredApi;
         this.currency = currency;
         this.botSetting = botSetting;
-        this.meteoradarUtil = meteoradarUtil;
+        this.weatherSiteUtil = weatherSiteUtil;
         this.urlSetting = urlSetting;
         this.currencySetting = currencySetting;
     }
@@ -68,20 +68,17 @@ public class Bot extends TelegramLongPollingBot {
                     } catch (IOException | NoDataOnSiteException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
-                    } catch (InvalidDataFormatException e) {
-                        sendMsg(message, "Неверный формат данных");
-                        logger.error(ERROR_MESSAGE, e);
                     }
                 }
                 case "текущая погода" ->{
                     try {
                         //send a picture from the site, mark the place on the map
                         execute(new SendPhoto()
-                                .setPhoto(new File(meteoradarUtil.getMapWithVillage(urlSetting.getGifFileNameFromMeteoinfo())))
+                                .setPhoto(new File(weatherSiteUtil.getMapWithVillage(urlSetting.getGifFileNameFromMeteoinfo())))
                                 .setChatId(message.getChatId().toString()));
 
                         //picture time message
-                        sendMsg(message, "погода " + meteoradarUtil.getTimeFromSiteWithNewTime(meteoradarUtil.getTitle()));
+                        sendMsg(message, "погода " + weatherSiteUtil.getTimeFromSiteWithNewTime(weatherSiteUtil.getTitle()));
                     } catch (TelegramApiException | IOException | ParseException | InvalidUrlException | NoDataOnSiteException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
@@ -92,7 +89,7 @@ public class Bot extends TelegramLongPollingBot {
                         //send animation about the weather for the last 3 hours
                         execute(new SendVideo()
                                 .setVideo(new File(
-                                        meteoradarUtil.getPathToFileInRootProject(
+                                        weatherSiteUtil.getPathToFileInRootProject(
                                                 urlSetting.getUrlToGifFile(),
                                                 urlSetting.getGifFileNameFromMeteoinfo())))
                                 .setChatId(message.getChatId().toString()));

@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-class MeteoradarUtilTest {
+class WeatherSiteUtilTest {
 
     @Autowired
-    private MeteoradarUtil meteoradarUtil;
+    private WeatherSiteUtil weatherSiteUtil;
 
     @Autowired
     private UrlSetting urlSetting;
@@ -67,14 +67,13 @@ class MeteoradarUtilTest {
 
     @Test
     void getPathToFileInRootProject() throws IOException, InvalidUrlException {
-
         //link availability check (code 200) "http://www.meteoinfo.by/radar/UMMN/radar-map.gif"
         URL linkToImage = new URL(urlSetting.getUrlToGifFile());
         HttpURLConnection urlToImagePng = (HttpURLConnection) linkToImage.openConnection();
         int responseCodeImage = urlToImagePng.getResponseCode();
         Assertions.assertEquals(200, responseCodeImage);
 
-        String pathToGifFile = meteoradarUtil.getPathToFileInRootProject(
+        String pathToGifFile = weatherSiteUtil.getPathToFileInRootProject(
                 urlSetting.getUrlToGifFile(),
                 urlSetting.getGifFileNameFromMeteoinfo());
         File file = new File(pathToGifFile);
@@ -85,13 +84,13 @@ class MeteoradarUtilTest {
 
     @Test
     void parseTitleForGettingTime() {
-        String timeFormatHHmm = meteoradarUtil.parseTitleForGettingTime(title);
+        String timeFormatHHmm = weatherSiteUtil.parseTitleForGettingTime(title);
         assertEquals("10:00", timeFormatHHmm);
     }
 
     @Test
     void parseTitleForGettingDate() {
-        String dateTime = meteoradarUtil.parseTitleForGettingDate(title);
+        String dateTime = weatherSiteUtil.parseTitleForGettingDate(title);
         assertEquals("03.06", dateTime);
     }
 }

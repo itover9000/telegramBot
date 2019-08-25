@@ -1,15 +1,20 @@
-package com.util;
+package com.service;
 
 import com.model.YandexModel;
 import com.settings.YandexSettings;
+import com.util.TransformObjectFromJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 @Service
-public class YandexTranslateUtil {
+public class YandexTranslate {
 
     @Autowired
     private YandexSettings yandexSettings;
@@ -18,26 +23,23 @@ public class YandexTranslateUtil {
     private TransformObjectFromJson<YandexModel> transformObjectFromJson;
 
     public String translateFromEngToRu(String text) throws IOException {
-
-        // replace all spaces with% 20 characters for the correct link
-        String textWithSpacesReplaced = text.replace(" ", "%20");
+        // encode text for the correct link
+        String encodeText = URLEncoder.encode(text, StandardCharsets.UTF_8);
 
         StringBuilder fullUrl = new StringBuilder()
                 .append(yandexSettings.getUrl())
                 .append(yandexSettings.getKey())
                 .append("&text=")
-                .append(textWithSpacesReplaced)
+                .append(encodeText)
                 .append("&lang=en-ru");
 
         URL url = new URL(fullUrl.toString());
 
         //transform json to yandexModel
-        YandexModel yandexModelFromJson = transformObjectFromJson.getObjectFromJson(url, YandexModel.class);
+        YandexModel yandexModel = transformObjectFromJson.getObjectFromJson(url, YandexModel.class);
 
-        StringBuilder translate = new StringBuilder();
-        if (yandexModelFromJson != null && yandexModelFromJson.getCode() == 200) {
-            yandexModelFromJson.getText().forEach(translate::append);
-            return translate.toString();
+        if (yandexModel.getCode() == Response.Status.OK.getStatusCode()) {
+            return yandexModel.getText().stream().map(StringBuilder::new).collect(Collectors.joining());
         } else return "Не удалось получить данные";
     }
 }

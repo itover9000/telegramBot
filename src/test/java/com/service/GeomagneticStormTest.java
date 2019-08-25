@@ -1,6 +1,5 @@
 package com.service;
 
-import com.exception.InvalidDataFormatException;
 import com.exception.NoDataOnSiteException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +36,7 @@ class GeomagneticStormTest {
     }
 
     @Test
-    void getGeomagneticStorm() throws InvalidDataFormatException, NoDataOnSiteException, IOException {
+    void getGeomagneticStorm() throws NoDataOnSiteException, IOException {
         URL urlResource = ClassLoader.getSystemResource("svpc.json");
         String answerFromJson = this.geomagneticStorm.getGeomagneticStorm(urlResource.toString());
         String expected = "Kp индекс шторма = 1\n" +

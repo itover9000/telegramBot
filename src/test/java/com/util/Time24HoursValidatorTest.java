@@ -17,7 +17,6 @@ class Time24HoursValidatorTest {
 
     @Test
     void isValidateTime24() {
-
         assertTrue(validator.isValidateTime24("00:00"));
         assertTrue(validator.isValidateTime24("0:00"));
         assertTrue(validator.isValidateTime24("23:59"));
@@ -32,10 +31,8 @@ class Time24HoursValidatorTest {
 
     }
 
-
     @Test
     void isValidateDate() {
-
         assertTrue(validator.isValidateDate("11.06"));
         assertTrue(validator.isValidateDate("01.01"));
         assertTrue(validator.isValidateDate("31.07"));

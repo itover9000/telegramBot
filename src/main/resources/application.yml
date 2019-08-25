@@ -31,6 +31,13 @@ currency:
     - 298
   urlApi: http://www.nbrb.by/API/ExRates/Rates/
 
+map:
+  x: 191
+  y: 188
+  width: 5
+  height: 5
+  message: Мозоли
+
 spring:
   mail:
     host: smtp.yandex.ru

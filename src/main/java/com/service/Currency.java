@@ -34,16 +34,16 @@ public class Currency {
         for (Integer idCurrency : currencyList) {
             URL url = new URL(stringUrl + idCurrency);
 
-            CurrencyModel currencyModelFromJson = transformObjectFromJson.getObjectFromJson(url, CurrencyModel.class);
+            CurrencyModel currencyModel = transformObjectFromJson.getObjectFromJson(url, CurrencyModel.class);
 
-            if (currencyModelFromJson.getCurAbbreviation().equals("RUB")) {
-                currencyModelFromJson.setCurAbbreviation("100RUB");
+            if (currencyModel.getCurAbbreviation().equals("RUB")) {
+                currencyModel.setCurAbbreviation("100RUB");
             }
 
             finalMessage
-                    .append(currencyModelFromJson.getCurAbbreviation())
+                    .append(currencyModel.getCurAbbreviation())
                     .append(" равен ")
-                    .append(currencyModelFromJson.getCurOfficialRate())
+                    .append(currencyModel.getCurOfficialRate())
                     .append("\n");
         }
         return finalMessage.toString();

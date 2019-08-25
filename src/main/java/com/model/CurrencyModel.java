@@ -9,10 +9,8 @@ import org.springframework.stereotype.Service;
 public class CurrencyModel {
     @SerializedName("Cur_ID")
     private int curId;
-
     @SerializedName("Cur_Abbreviation")
     private String curAbbreviation;
-
     @SerializedName("Cur_OfficialRate")
     private double curOfficialRate;
 }

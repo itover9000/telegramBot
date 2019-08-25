@@ -1,6 +1,5 @@
 package com.util;
 
-import com.exception.InvalidDataFormatException;
 import com.exception.NoDataOnSiteException;
 import com.model.GeomagneticStormModel;
 import com.service.GeomagneticStorm;
@@ -21,6 +20,7 @@ import java.util.List;
 public class GeomagneticStormUtil {
     private static final Logger logger = LogManager.getLogger(GeomagneticStormUtil.class);
     private static final String MESSAGE_LOGGER = "An exception occurred!";
+    private static final int INDEX_THRESHOLD = 4;
 
     @Autowired
     private MailSenderSetting emailSetting;
@@ -35,7 +35,6 @@ public class GeomagneticStormUtil {
     private MailSender mailSender;
 
     private final GeomagneticStorm geomagneticStorm;
-
     private boolean isStorm;
 
     @Autowired
@@ -50,7 +49,6 @@ public class GeomagneticStormUtil {
     }
 
     private void check() {
-
         StringBuilder description = new StringBuilder()
                 .append("\nКачественно состояние магнитного поля в зависимости от Кp индекса\n")
                 .append("Kp <= 2 — спокойное;\n")
@@ -61,31 +59,25 @@ public class GeomagneticStormUtil {
 
         try {
             GeomagneticStormModel stormModelForCheck = getStormModel(urlSetting.getUrlToGeomagneticSite());
-            if (stormModelForCheck.getKpIndex() > 4) {
+            if (stormModelForCheck.getKpIndex() > INDEX_THRESHOLD) {
                 isStorm = true;
                 String storm = geomagneticStorm.getGeomagneticStorm(urlSetting.getUrlToGeomagneticSite());
                 mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря!", storm + description);
-            } else if (isStorm && stormModelForCheck.getKpIndex() < 4) {
+            } else if (isStorm && stormModelForCheck.getKpIndex() < INDEX_THRESHOLD) {
                 isStorm = false;
                 String storm = geomagneticStorm.getGeomagneticStorm(urlSetting.getUrlToGeomagneticSite());
                 mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря закончилась", storm);
             }
-        } catch (IOException | NoDataOnSiteException | InvalidDataFormatException e) {
+        } catch (IOException | NoDataOnSiteException e) {
             logger.error(MESSAGE_LOGGER, e);
         }
     }
 
     public GeomagneticStormModel getStormModel(String stringUrl) throws IOException, NoDataOnSiteException {
         URL url = new URL(stringUrl);
-
         List<GeomagneticStormModel> listStormModelFromJson = transformObjectFromJson.getListObjectsFromJson(url, GeomagneticStormModel.class);
 
-        GeomagneticStormModel stormModelFromJson = listStormModelFromJson.stream().reduce((first, second) -> second).orElse(null);
-        if (stormModelFromJson != null) {
-            //return last kpIndex
-            return stormModelFromJson;
-        } else throw new NoDataOnSiteException(MESSAGE_LOGGER);
+        return listStormModelFromJson.stream().reduce((first, second) -> second)
+                .orElseThrow(() -> new NoDataOnSiteException(MESSAGE_LOGGER));
     }
-
-
 }

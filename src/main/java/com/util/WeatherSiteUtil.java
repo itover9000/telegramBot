@@ -21,7 +21,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -29,20 +30,19 @@ import java.util.concurrent.TimeUnit;
 
 
 @Service
-public class MeteoradarUtil {
+public class WeatherSiteUtil {
 
     @Autowired
     private UrlSetting urlSetting;
 
     private final Time24HoursValidator validator;
     private String title;
-    private static final String TABLE = "table";
     private static final String EXCEPTION_MESSAGE = "Invalid URL";
 
     private final DrawVillageOnMap drawVillageOnMap;
 
     @Autowired
-    public MeteoradarUtil(Time24HoursValidator validator, DrawVillageOnMap drawVillageOnMap) {
+    public WeatherSiteUtil(Time24HoursValidator validator, DrawVillageOnMap drawVillageOnMap) {
         this.validator = validator;
         this.drawVillageOnMap = drawVillageOnMap;
     }
@@ -55,63 +55,58 @@ public class MeteoradarUtil {
 
     public String getImageFromUrl() throws IOException, InvalidUrlException, NoDataOnSiteException {
         Document doc = Jsoup.connect(urlSetting.getUrlMainPageMeteoinfo()).get();
-        Element tableElement;
 
-        //table existence check
-        if (!doc.select(TABLE).isEmpty() && doc.select(TABLE).size() >= 3) {
-            tableElement = doc.select(TABLE).get(2); //select the third TABLE.
-        } else throw new NoDataOnSiteException("Missing data on the site");
-        Elements rows = tableElement.select("tr");
+        //get element by id
+        Elements rdr = doc.select("rdr");
+        if (rdr.isEmpty()) throw new NoDataOnSiteException("Missing data on the site");
 
-        title = rows.get(0).getElementsByTag("img").get(0).attr("title");
+        Element elementImg = rdr.get(0).getElementsByTag("img").get(0);
+        title = elementImg.attr("title");
         //select absolute path from TABLE
-        String url = rows.get(0).getElementsByTag("img").get(0).absUrl("src");
+        String url = elementImg.absUrl("src");
 
-        //Check the received url for validity, if that - we throw an exception
-        String[] schemes = {"http", "https"};
-        UrlValidator urlValidator = new UrlValidator(schemes);
-
-        if (url == null || url.isEmpty() || !urlValidator.isValid(url)) {
+        UrlValidator urlValidator = new UrlValidator();
+        // check url by validator
+        if (!url.isBlank() || !urlValidator.isValid(url)) {
             throw new InvalidUrlException(EXCEPTION_MESSAGE);
         } else return url;
     }
 
 
     public String getTimeFromSiteWithNewTime(String title) throws ParseException {
-        if (title != null && !title.isEmpty()) {
-            //get time in the format "HH:mm"  16:35
-            String validTime = parseTitleForGettingTime(title);
-
-            //get date in the format dd.MM 13.06
-            String validDate = parseTitleForGettingDate(title);
-
-            if (validTime != null && !validTime.isEmpty() && validDate != null && !validDate.isEmpty()) {
-
-                //get current year
-                Calendar calendar = Calendar.getInstance();   // Gets the current date and time
-                int year = calendar.get(Calendar.YEAR);       // The current year
-
-                //set the format time
-                SimpleDateFormat format = new SimpleDateFormat("HH:mm dd.MM.yyyy");
-                //set the time zone
-                format.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                //parse incoming time in format "HH:mm dd.MM.yyyy"
-                Date past = format.parse(validTime + " " + validDate + "." + year);
-
-                Date now = new Date();
-
-                PrettyTime prettyTime = new PrettyTime(now, new Locale("ru"));
-                String prettyFormat = prettyTime.format(past);
-
-                //consider the difference between the current date and the one obtained from title
-                long minutes = TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());
-                long hours = TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime());
-
-                return correctEndingInTime(hours, minutes, prettyFormat);
-            }
+        if (title.isBlank()) {
+            return "неверный формат";
         }
-        return "неверный формат";
+
+        //get time in the format "HH:mm"  16:35
+        String validTime = parseTitleForGettingTime(title);
+
+        //get date in the format dd.MM 13.06
+        String validDate = parseTitleForGettingDate(title);
+
+        if (!validTime.isBlank() && !validDate.isBlank()) {
+            // Get the current date and time
+            LocalDate localDate = LocalDate.now();
+            // The current year, because in title only day and month
+            int year = localDate.getYear();
+            //set the format time
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm dd.MM.yyyy");
+            //set the time zone
+            format.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+            //parse incoming time in format "HH:mm dd.MM.yyyy"
+            Date past = format.parse(validTime + " " + validDate + "." + year);
+
+            Date now = new Date();
+
+            PrettyTime prettyTime = new PrettyTime(now, new Locale("ru"));
+            String prettyFormat = prettyTime.format(past);
+
+            //consider the difference between the current date and the one obtained from title
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());
+            long hours = TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime());
+
+            return correctEndingInTime(hours, minutes, prettyFormat);
+        } else return "неверный формат";
     }
 
     //make sure that there is a correct ending минут\минуты\минута час\часа\часов
@@ -128,7 +123,7 @@ public class MeteoradarUtil {
             } else if (minutes % 60 == 1) {
                 return hours + TimeEnum.HOUR.getTranslation() + minutes % 60 + TimeEnum.MINUTE.getTranslation();
             } else if (minutes % 60 >= 2 && minutes % 60 <= 4) {
-                return hours + TimeEnum.HOUR.getTranslation() + minutes % 60 +TimeEnum.MINUTES_OTHER.getTranslation();
+                return hours + TimeEnum.HOUR.getTranslation() + minutes % 60 + TimeEnum.MINUTES_OTHER.getTranslation();
             } else {
                 return hours + TimeEnum.HOUR.getTranslation() + minutes % 60 + TimeEnum.MINUTES.getTranslation();
             }
