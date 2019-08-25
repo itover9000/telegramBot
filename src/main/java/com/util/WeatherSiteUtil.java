@@ -73,7 +73,7 @@ public class WeatherSiteUtil {
     }
 
 
-    public String getTimeFromSiteWithNewTime(String title) throws ParseException {
+    public String getTimeFromSiteWithNewTime() throws ParseException {
         if (title.isBlank()) {
             return "неверный формат";
         }
@@ -207,9 +207,5 @@ public class WeatherSiteUtil {
             //max size 5Mb
             fos.getChannel().transferFrom(rbc, 0, 5 * 1024 * 1024);
         }
-    }
-
-    public String getTitle() {
-        return title;
     }
 }

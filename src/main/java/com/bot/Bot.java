@@ -1,6 +1,5 @@
 package com.bot;
 
-import com.exception.InvalidDataFormatException;
 import com.exception.InvalidUrlException;
 import com.exception.NoDataOnSiteException;
 import com.service.BoredApi;
@@ -78,7 +77,7 @@ public class Bot extends TelegramLongPollingBot {
                                 .setChatId(message.getChatId().toString()));
 
                         //picture time message
-                        sendMsg(message, "погода " + weatherSiteUtil.getTimeFromSiteWithNewTime(weatherSiteUtil.getTitle()));
+                        sendMsg(message, "погода " + weatherSiteUtil.getTimeFromSiteWithNewTime());
                     } catch (TelegramApiException | IOException | ParseException | InvalidUrlException | NoDataOnSiteException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
