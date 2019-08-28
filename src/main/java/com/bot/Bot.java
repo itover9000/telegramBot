@@ -62,7 +62,7 @@ public class Bot extends TelegramLongPollingBot {
 
         if (message != null && message.hasText()) {
             switch (message.getText().toLowerCase().strip()) {
-                case "магн. буря" ->{
+                case "магн. буря" -> {
                     try {
                         sendMsg(message, geomagneticStorm.getGeomagneticStorm(urlSetting.getUrlToGeomagneticSite()));
                     } catch (IOException | NoDataOnSiteException e) {
@@ -70,7 +70,7 @@ public class Bot extends TelegramLongPollingBot {
                         logger.error(ERROR_MESSAGE, e);
                     }
                 }
-                case "текущая погода" ->{
+                case "текущая погода" -> {
                     try {
                         //send a picture from the site, mark the place on the map
                         execute(new SendPhoto()
@@ -84,7 +84,7 @@ public class Bot extends TelegramLongPollingBot {
                         logger.error(ERROR_MESSAGE, e);
                     }
                 }
-                case "анимация погоды" ->{
+                case "анимация погоды" -> {
                     try {
                         //send animation about the weather for the last 3 hours
                         execute(new SendVideo()
@@ -98,7 +98,7 @@ public class Bot extends TelegramLongPollingBot {
                         logger.error(ERROR_MESSAGE, e);
                     }
                 }
-                case "скучно!" ->{
+                case "скучно!" -> {
                     try {
                         sendMsg(message, boredApi.getBoredStringFormat(urlSetting.getUrlToBoredapi()));
                     } catch (IOException e) {
@@ -106,7 +106,7 @@ public class Bot extends TelegramLongPollingBot {
                         logger.error(ERROR_MESSAGE, e);
                     }
                 }
-                case "курс валют" ->{
+                case "курс валют" -> {
                     try {
                         sendMsg(message, currencyInBYN.getCurrency(currencySetting.getUrlApi()));
                     } catch (IOException e) {
@@ -114,12 +114,13 @@ public class Bot extends TelegramLongPollingBot {
                         logger.error(ERROR_MESSAGE, e);
                     }
                 }
-                default ->sendMsg(message, "Неизвестная команда");
+                default -> sendMsg(message, "Неизвестная команда");
             }
         }
     }
 
     public String getBotUsername() {
+        logger.info("username: ", botSetting.getUsername());
         return botSetting.getUsername();
     }
 

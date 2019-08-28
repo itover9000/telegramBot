@@ -48,3 +48,8 @@ spring:
     port: 465
     protocol: smtps
     emailRecipient: over9000@tut.by
+
+jasypt:
+  encryptor:
+    algorithm: PBEWithMD5AndDES
+    password: over9000

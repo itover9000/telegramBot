@@ -1,6 +1,7 @@
 package com.util;
 
 import com.exception.InvalidUrlException;
+import com.exception.NoDataOnSiteException;
 import com.settings.UrlSetting;
 import org.junit.gen5.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -31,8 +32,7 @@ class WeatherSiteUtilTest {
 
     private String title;
 
-    // For technical reasons, the radar does not work, because this test now will be failed
-   /* @Test
+    @Test
     void getImageFromUrl() throws IOException, InvalidUrlException, NoDataOnSiteException {
         //http://www.meteoinfo.by/radar/UMMN/UMMN_1559557200.png
         String link = urlSetting.getUrlMainPageMeteoinfo();
@@ -44,7 +44,7 @@ class WeatherSiteUtilTest {
         assertEquals(200, responseCode);
 
         //link availability check (code 200) http://www.meteoinfo.by/radar/UMMN/UMMN_1559557200.png
-        String urlToImage = meteoradarUtil.getImageFromUrl();
+        String urlToImage = weatherSiteUtil.getImageFromUrl();
         URL linkToImage = new URL(link);
         HttpURLConnection urlToImagePng = (HttpURLConnection) linkToImage.openConnection();
         int responseCodeImage = urlToImagePng.getResponseCode();
@@ -53,7 +53,7 @@ class WeatherSiteUtilTest {
         //checking the correctness of the returned link
         assertTrue(urlToImage.endsWith(".png"));
         assertTrue(urlToImage.startsWith("http://www.meteoinfo.by/radar"));
-    }*/
+    }
 
     @BeforeEach
     void setUp() {

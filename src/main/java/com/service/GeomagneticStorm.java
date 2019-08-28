@@ -43,7 +43,8 @@ public class GeomagneticStorm {
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
-        ZoneId zoneLocalMachine = ZoneId.of(TimeZone.getDefault().getDisplayName());
+        // zoneId local machine
+        ZoneId zoneLocalMachine = ZoneId.of(TimeZone.getDefault().toZoneId().toString());
         // get localDateTime from json
         LocalDateTime localDateTime = LocalDateTime.parse(dateForParse, inputFormatter);
         //transform localDateTime to zonedDateTime adjusted UTC

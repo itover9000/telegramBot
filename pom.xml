@@ -12,8 +12,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <start-class>com.Application</start-class>
         <java.version>1.12</java.version>
+        <argLine>--enable-preview</argLine>
+        <maven.compiler.release>12</maven.compiler.release>
         <maven.compiler.source>12</maven.compiler.source>
         <maven.compiler.target>12</maven.compiler.target>
     </properties>
@@ -158,6 +159,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.9.9</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.github.ulisesbocchio/jasypt-spring-boot-starter -->
@@ -173,9 +175,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
                 <configuration>
                     <release>12</release>
                     <compilerArgs>--enable-preview</compilerArgs>
+                    <source>12</source>
+                    <target>12</target>
                 </configuration>
             </plugin>
 
@@ -211,6 +216,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <jvmArguments>--enable-preview</jvmArguments>
+                </configuration>
                 <goals>
                     <goal>repackage</goal>
                 </goals>
