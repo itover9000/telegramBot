@@ -10,16 +10,18 @@ import java.net.URL;
 
 @Service
 public class BoredApi {
+    private final YandexTranslate yandexTranslate;
+    private final TransformObjectFromJson<BoredModel> transformObjectFromJson;
 
     @Autowired
-    private YandexTranslate yandexTranslate;
+    public BoredApi(YandexTranslate yandexTranslate, TransformObjectFromJson<BoredModel> transformObjectFromJson) {
+        this.yandexTranslate = yandexTranslate;
+        this.transformObjectFromJson = transformObjectFromJson;
+    }
 
-    @Autowired
-    private TransformObjectFromJson<BoredModel> transformObjectFromJson;
-
-    public String getBoredStringFormat(String stringUrl) throws IOException {
-        URL url = new URL(stringUrl);
-        BoredModel boredModel = transformObjectFromJson.getObjectFromJson(url, BoredModel.class);
+    public String getBoredStringFormat(String url) throws IOException {
+        URL urlBored = new URL(url);
+        BoredModel boredModel = transformObjectFromJson.getObjectFromJson(urlBored, BoredModel.class);
 
         StringBuilder answer = new StringBuilder()
                 .append("Мероприятие: ").append(yandexTranslate.translateFromEngToRu(boredModel.getActivity())).append("\n")

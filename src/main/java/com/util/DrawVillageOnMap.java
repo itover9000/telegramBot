@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Font;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -13,12 +15,15 @@ import java.io.IOException;
 @Component
 public class DrawVillageOnMap {
     private static final Font FONT = new Font("TimesRoman", Font.PLAIN, 9);
+    private final DrawVillageSetting villageSetting;
 
     @Autowired
-    private DrawVillageSetting villageSetting;
+    public DrawVillageOnMap(DrawVillageSetting villageSetting) {
+        this.villageSetting = villageSetting;
+    }
 
     // set the location of the village relative to the upper left corner
-    public void mapWithVillage(String pathToMap) throws IOException {
+    void mapWithVillage(String pathToMap) throws IOException {
         // Open picture file, load into a BufferedImage.
         BufferedImage img = ImageIO.read(new File(pathToMap));
 

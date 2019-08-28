@@ -18,36 +18,38 @@ import java.util.List;
 
 @Service
 public class GeomagneticStormUtil {
-    private static final Logger logger = LogManager.getLogger(GeomagneticStormUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger(GeomagneticStormUtil.class);
     private static final String MESSAGE_LOGGER = "An exception occurred!";
     private static final int INDEX_THRESHOLD = 4;
 
-    @Autowired
-    private MailSenderSetting emailSetting;
-
-    @Autowired
-    private TransformObjectFromJson<GeomagneticStormModel> transformObjectFromJson;
-
-    @Autowired
-    private UrlSetting urlSetting;
-
-    @Autowired
-    private MailSender mailSender;
-
+    private final MailSenderSetting emailSetting;
+    private final TransformObjectFromJson<GeomagneticStormModel> transformObjectFromJson;
+    private final UrlSetting urlSetting;
+    private final MailSender mailSender;
     private final GeomagneticStorm geomagneticStorm;
     private boolean isStorm;
 
     @Autowired
-    public GeomagneticStormUtil(GeomagneticStorm geomagneticStorm) {
+    public GeomagneticStormUtil(GeomagneticStorm geomagneticStorm, MailSenderSetting emailSetting,
+                                TransformObjectFromJson<GeomagneticStormModel> transformObjectFromJson,
+                                UrlSetting urlSetting, MailSender mailSender) {
         this.geomagneticStorm = geomagneticStorm;
+        this.emailSetting = emailSetting;
+        this.transformObjectFromJson = transformObjectFromJson;
+        this.urlSetting = urlSetting;
+        this.mailSender = mailSender;
+    }
+
+    public GeomagneticStormModel getStormModel(String url) throws IOException, NoDataOnSiteException {
+        URL urlStorm = new URL(url);
+        List<GeomagneticStormModel> listStormModelFromJson = transformObjectFromJson.getListObjectsFromJson(urlStorm, GeomagneticStormModel.class);
+
+        return listStormModelFromJson.stream().reduce((first, second) -> second)
+                .orElseThrow(() -> new NoDataOnSiteException(MESSAGE_LOGGER));
     }
 
     // check storm every 15 minutes, if kpIndex > 4, then will be sent message to email
     @Scheduled(fixedRate = 15 * 1000 * 1000)
-    public void checkStormEvery15Minutes() {
-        check();
-    }
-
     private void check() {
         StringBuilder description = new StringBuilder()
                 .append("\nКачественно состояние магнитного поля в зависимости от Кp индекса\n")
@@ -69,15 +71,7 @@ public class GeomagneticStormUtil {
                 mailSender.send(emailSetting.getEmailRecipient(), "Геомагнитная буря закончилась", storm);
             }
         } catch (IOException | NoDataOnSiteException e) {
-            logger.error(MESSAGE_LOGGER, e);
+            LOGGER.error(MESSAGE_LOGGER, e);
         }
-    }
-
-    public GeomagneticStormModel getStormModel(String stringUrl) throws IOException, NoDataOnSiteException {
-        URL url = new URL(stringUrl);
-        List<GeomagneticStormModel> listStormModelFromJson = transformObjectFromJson.getListObjectsFromJson(url, GeomagneticStormModel.class);
-
-        return listStormModelFromJson.stream().reduce((first, second) -> second)
-                .orElseThrow(() -> new NoDataOnSiteException(MESSAGE_LOGGER));
     }
 }

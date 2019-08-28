@@ -4,6 +4,7 @@ import com.exception.NoDataOnSiteException;
 import com.model.GeomagneticStormModel;
 import com.util.GeomagneticStormUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,8 +17,27 @@ import java.util.TimeZone;
 
 @Service
 public class GeomagneticStorm {
+    private final GeomagneticStormUtil geomagneticStormUtil;
+
     @Autowired
-    private GeomagneticStormUtil geomagneticStormUtil;
+    public GeomagneticStorm(@Lazy GeomagneticStormUtil geomagneticStormUtil) {
+        this.geomagneticStormUtil = geomagneticStormUtil;
+    }
+
+    public String getGeomagneticStorm(String url) throws IOException, NoDataOnSiteException {
+        GeomagneticStormModel stormModelLastElement = geomagneticStormUtil.getStormModel(url);
+        if (stormModelLastElement != null) {
+            //check last kpIndex in List
+            StringBuilder returnText = new StringBuilder()
+                    .append("Kp индекс шторма = ").append(stormModelLastElement.getKpIndex()).append("\n")
+                    .append("время ").append(parseGeomagneticStorm(stormModelLastElement.getTimeTag()));
+            if (stormModelLastElement.getKpIndex() > 4) {
+                returnText.append("\nВнимание, сильная буря!");
+            }
+            return String.valueOf(returnText);
+        }
+        return "не удалось получить данные";
+    }
 
     private String parseGeomagneticStorm(String dateForParse) {
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -33,18 +53,4 @@ public class GeomagneticStorm {
         return zonedDateTimeLocalMachine.format(outputFormatter);
     }
 
-    public String getGeomagneticStorm(String stringUrl) throws IOException, NoDataOnSiteException {
-        GeomagneticStormModel stormModelLastElement = geomagneticStormUtil.getStormModel(stringUrl);
-        if (stormModelLastElement != null) {
-            //check last kpIndex in List
-            StringBuilder returnText = new StringBuilder()
-                    .append("Kp индекс шторма = ").append(stormModelLastElement.getKpIndex()).append("\n")
-                    .append("время ").append(parseGeomagneticStorm(stormModelLastElement.getTimeTag()));
-            if (stormModelLastElement.getKpIndex() > 4) {
-                returnText.append("\nВнимание, сильная буря!");
-            }
-            return String.valueOf(returnText);
-        }
-        return "не удалось получить данные";
-    }
 }

@@ -3,7 +3,7 @@ package com.bot;
 import com.exception.InvalidUrlException;
 import com.exception.NoDataOnSiteException;
 import com.service.BoredApi;
-import com.service.Currency;
+import com.service.CurrencyInBYN;
 import com.service.GeomagneticStorm;
 import com.settings.BotSetting;
 import com.settings.CurrencySetting;
@@ -39,17 +39,18 @@ public class Bot extends TelegramLongPollingBot {
     private final BotSetting botSetting;
     private final GeomagneticStorm geomagneticStorm;
     private final BoredApi boredApi;
-    private final Currency currency;
+    private final CurrencyInBYN currencyInBYN;
     private final UrlSetting urlSetting;
     private final CurrencySetting currencySetting;
 
 
     @Autowired
-    public Bot(GeomagneticStorm geomagneticStorm, BoredApi boredApi, Currency currency,
-               BotSetting botSetting, WeatherSiteUtil weatherSiteUtil, UrlSetting urlSetting, CurrencySetting currencySetting) {
+    public Bot(GeomagneticStorm geomagneticStorm, BoredApi boredApi, CurrencyInBYN currencyInBYN,
+               BotSetting botSetting, WeatherSiteUtil weatherSiteUtil,
+               UrlSetting urlSetting, CurrencySetting currencySetting) {
         this.geomagneticStorm = geomagneticStorm;
         this.boredApi = boredApi;
-        this.currency = currency;
+        this.currencyInBYN = currencyInBYN;
         this.botSetting = botSetting;
         this.weatherSiteUtil = weatherSiteUtil;
         this.urlSetting = urlSetting;
@@ -77,7 +78,7 @@ public class Bot extends TelegramLongPollingBot {
                                 .setChatId(message.getChatId().toString()));
 
                         //picture time message
-                        sendMsg(message, "погода " + weatherSiteUtil.getTimeFromSiteWithNewTime());
+                        sendMsg(message, "погода " + weatherSiteUtil.getTimeFromTitleAndCompareDifferenceWithCurrentTime());
                     } catch (TelegramApiException | IOException | ParseException | InvalidUrlException | NoDataOnSiteException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
@@ -107,7 +108,7 @@ public class Bot extends TelegramLongPollingBot {
                 }
                 case "курс валют" ->{
                     try {
-                        sendMsg(message, currency.getCurrency(currencySetting.getUrlApi()));
+                        sendMsg(message, currencyInBYN.getCurrency(currencySetting.getUrlApi()));
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
@@ -116,6 +117,14 @@ public class Bot extends TelegramLongPollingBot {
                 default ->sendMsg(message, "Неизвестная команда");
             }
         }
+    }
+
+    public String getBotUsername() {
+        return botSetting.getUsername();
+    }
+
+    public String getBotToken() {
+        return botSetting.getToken();
     }
 
     private void sendMsg(Message message, String text) {
@@ -151,13 +160,5 @@ public class Bot extends TelegramLongPollingBot {
         });
 
         keyboardMarkup.setKeyboard(keyboardRows);
-    }
-
-    public String getBotUsername() {
-        return botSetting.getUsername();
-    }
-
-    public String getBotToken() {
-        return botSetting.getToken();
     }
 }

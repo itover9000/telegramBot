@@ -2,7 +2,9 @@ package com.util;
 
 import com.model.BoredModel;
 import com.model.GeomagneticStormModel;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,24 +30,18 @@ class TransformObjectFromJsonTest {
     private TransformObjectFromJson<GeomagneticStormModel> transformListObjectsFromJson;
 
     private List<GeomagneticStormModel> expectedList;
-    private TransformObjectFromJson objectFromJson;
 
     @BeforeEach
     void setUp() {
-        // This the place where everything should be done to ensure a clean and
-        // consistent state of things to test
         expectedList = new ArrayList<>();
         expectedList.add(new GeomagneticStormModel("2019-05-15T11:52:00", 0));
         expectedList.add(new GeomagneticStormModel("2019-05-15T11:53:00", 2));
         expectedList.add(new GeomagneticStormModel("2019-05-15T11:54:00", 1));
-
-        objectFromJson = new TransformObjectFromJson();
     }
 
     @AfterEach
     void tearDown() {
         expectedList = null;
-        objectFromJson = null;
     }
 
     @Test
@@ -78,7 +74,7 @@ class TransformObjectFromJsonTest {
         // invoke private method and compare text from json
         Method method = TransformObjectFromJson.class.getDeclaredMethod("getJSONStringFormat", URL.class);
         method.setAccessible(true);
-        String invoke = (String) method.invoke(objectFromJson, urlResource);
+        String invoke = (String) method.invoke(transformObjectFromJson, urlResource);
         String expected = "{\"activity\":\"Have a photo session with some friends\",\"accessibility\":0.8,\"type\":\"social\",\"participants\":4,\"price\":0.05,\"key\":\"3305912\"}";
         assertEquals(expected, invoke);
     }

@@ -8,7 +8,6 @@ import org.apache.commons.validator.UrlValidator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -31,20 +31,17 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class WeatherSiteUtil {
-
-    @Autowired
-    private UrlSetting urlSetting;
-
-    private final Time24HoursValidator validator;
-    private String title;
     private static final String EXCEPTION_MESSAGE = "Invalid URL";
-
+    private String title;
+    private final Time24HoursValidator validator;
     private final DrawVillageOnMap drawVillageOnMap;
+    private final UrlSetting urlSetting;
 
     @Autowired
-    public WeatherSiteUtil(Time24HoursValidator validator, DrawVillageOnMap drawVillageOnMap) {
+    public WeatherSiteUtil(Time24HoursValidator validator, DrawVillageOnMap drawVillageOnMap, UrlSetting urlSetting) {
         this.validator = validator;
         this.drawVillageOnMap = drawVillageOnMap;
+        this.urlSetting = urlSetting;
     }
 
     public String getMapWithVillage(String fileName) throws IOException, InvalidUrlException, NoDataOnSiteException {
@@ -57,23 +54,23 @@ public class WeatherSiteUtil {
         Document doc = Jsoup.connect(urlSetting.getUrlMainPageMeteoinfo()).get();
 
         //get element by id
-        Elements rdr = doc.select("rdr");
-        if (rdr.isEmpty()) throw new NoDataOnSiteException("Missing data on the site");
+        Element rdr = doc.getElementById("rdr");
 
-        Element elementImg = rdr.get(0).getElementsByTag("img").get(0);
+        if (!rdr.hasText()) throw new NoDataOnSiteException("Missing data on the site");
+
+        Element elementImg = rdr.getElementsByTag("img").get(0);
         title = elementImg.attr("title");
         //select absolute path from TABLE
         String url = elementImg.absUrl("src");
 
         UrlValidator urlValidator = new UrlValidator();
         // check url by validator
-        if (!url.isBlank() || !urlValidator.isValid(url)) {
+        if (url.isBlank() || !urlValidator.isValid(url)) {
             throw new InvalidUrlException(EXCEPTION_MESSAGE);
         } else return url;
     }
 
-
-    public String getTimeFromSiteWithNewTime() throws ParseException {
+    public String getTimeFromTitleAndCompareDifferenceWithCurrentTime() throws ParseException {
         if (title.isBlank()) {
             return "неверный формат";
         }
@@ -85,9 +82,9 @@ public class WeatherSiteUtil {
         String validDate = parseTitleForGettingDate(title);
 
         if (!validTime.isBlank() && !validDate.isBlank()) {
-            // Get the current date and time
+            // get the current date and time
             LocalDate localDate = LocalDate.now();
-            // The current year, because in title only day and month
+            // the current year, because in title only day and month
             int year = localDate.getYear();
             //set the format time
             SimpleDateFormat format = new SimpleDateFormat("HH:mm dd.MM.yyyy");
@@ -107,6 +104,49 @@ public class WeatherSiteUtil {
 
             return correctEndingInTime(hours, minutes, prettyFormat);
         } else return "неверный формат";
+    }
+
+    public String getPathToFileInRootProject(String urlForDownloadGif, String fileName) throws IOException, InvalidUrlException {
+        File file = new File(fileName);
+        URL website = new URL(urlForDownloadGif);
+
+        if (!file.exists()) {
+            //if the file does not exist, then download and copy to the root of the project
+            copyGifToRootProject(file, website);
+        } else {
+            long contentLengthGif = website.openConnection().getContentLengthLong();
+            //if the file is different in size, then replace with a new file
+            if (contentLengthGif == -1) {
+                throw new InvalidUrlException(EXCEPTION_MESSAGE);
+            } else if (file.length() != contentLengthGif) {
+                copyGifToRootProject(file, website);
+            }
+        }
+        return file.toString();
+    }
+
+    String parseTitleForGettingTime(String text) {
+        // return time from the text in the format HH: mm
+        return Arrays.stream(text.split("\\s"))
+                .filter(validator::isValidateTime24)
+                .findFirst()
+                .orElse("");
+    }
+
+    String parseTitleForGettingDate(String text) {
+        //return the date from the text in the format dd.mm
+        return Arrays.stream(text.split("\\s"))
+                .filter(validator::isValidateDate)
+                .findFirst()
+                .orElse("");
+    }
+
+    private void copyGifToRootProject(File file, URL website) throws IOException {
+        try (ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+             FileOutputStream fos = new FileOutputStream(file.toString())) {
+            //max size 5Mb
+            fos.getChannel().transferFrom(rbc, 0, 5 * 1024 * 1024);
+        }
     }
 
     //make sure that there is a correct ending минут\минуты\минута час\часа\часов
@@ -154,58 +194,5 @@ public class WeatherSiteUtil {
         }
 
         return "время не попало под диапазон";
-    }
-
-    public String parseTitleForGettingTime(String text) {
-        // return time from the text in the format HH: mm
-        String resultTime = "";
-        String[] splitText = text.split(" ");
-        for (String time : splitText) {
-            if (validator.isValidateTime24(time)) {
-                resultTime = time;
-                break;
-            }
-        }
-        return resultTime;
-    }
-
-    public String parseTitleForGettingDate(String text) {
-        //return the date from the text in the format dd.mm
-        String resultDate = "";
-        String[] splitText = text.split(" ");
-        for (String time : splitText) {
-            if (validator.isValidateDate(time)) {
-                resultDate = time;
-                break;
-            }
-        }
-        return resultDate;
-    }
-
-    public String getPathToFileInRootProject(String urlForDownloadGif, String fileName) throws IOException, InvalidUrlException {
-        File file = new File(fileName);
-        URL website = new URL(urlForDownloadGif);
-
-        if (!file.exists()) {
-            //if the file does not exist, then download and copy to the root of the project
-            copyGifToRootProject(file, website);
-        } else {
-            long contentLengthGif = website.openConnection().getContentLengthLong();
-            //if the file is different in size, then replace with a new file
-            if (contentLengthGif == -1) {
-                throw new InvalidUrlException(EXCEPTION_MESSAGE);
-            } else if (file.length() != contentLengthGif) {
-                copyGifToRootProject(file, website);
-            }
-        }
-        return file.toString();
-    }
-
-    private void copyGifToRootProject(File file, URL website) throws IOException {
-        try (ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-             FileOutputStream fos = new FileOutputStream(file.toString())) {
-            //max size 5Mb
-            fos.getChannel().transferFrom(rbc, 0, 5 * 1024 * 1024);
-        }
     }
 }

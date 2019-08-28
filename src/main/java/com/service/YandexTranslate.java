@@ -15,12 +15,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class YandexTranslate {
+    private final YandexSettings yandexSettings;
+    private final TransformObjectFromJson<YandexModel> transformObjectFromJson;
 
     @Autowired
-    private YandexSettings yandexSettings;
-
-    @Autowired
-    private TransformObjectFromJson<YandexModel> transformObjectFromJson;
+    public YandexTranslate(YandexSettings yandexSettings, TransformObjectFromJson<YandexModel> transformObjectFromJson) {
+        this.yandexSettings = yandexSettings;
+        this.transformObjectFromJson = transformObjectFromJson;
+    }
 
     public String translateFromEngToRu(String text) throws IOException {
         // encode text for the correct link

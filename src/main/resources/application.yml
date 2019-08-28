@@ -1,6 +1,8 @@
 bot:
   token: 884639123:AAGJUFOWF9hoyk4_qM7vNw3YFYHXpsxVAMA
+#  token: ENC(icQT+xI7e1QixTaJEztP+Q==)
   username: itover9000_bot
+#  username: ENC(ChB7qI1xGqdqFiJsABMhdpiPVaNWoBy3)
   buttons:
     firstRow:
       - магн. буря

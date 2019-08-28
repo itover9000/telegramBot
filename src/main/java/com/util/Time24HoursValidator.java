@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 @Component
 public class Time24HoursValidator {
     private static final String TIME_24_HOURS_PATTERN = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
-
     /*
     (# start group 1
      # 0?[1-9]              01-09 or 1-9
@@ -29,11 +28,11 @@ public class Time24HoursValidator {
         patternDay = Pattern.compile(DATE_PATTERN);
     }
 
-    public boolean isValidateTime24(String time) {
+    boolean isValidateTime24(String time) {
         return patternTime24.matcher(time).matches();
     }
 
-    public boolean isValidateDate(String date) {
+    boolean isValidateDate(String date) {
         return patternDay.matcher(date).matches();
     }
 }

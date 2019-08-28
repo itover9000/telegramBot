@@ -1,8 +1,6 @@
 package com.service;
 
 import com.exception.NoDataOnSiteException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +21,6 @@ class GeomagneticStormTest {
     @Autowired
     private GeomagneticStorm geomagneticStorm;
 
-    private GeomagneticStorm geomagneticStormClass;
-
-    @BeforeEach
-    void setUp() {
-        geomagneticStormClass = new GeomagneticStorm();
-    }
-
-    @AfterEach
-    void tearDown() {
-        geomagneticStormClass = null;
-    }
-
     @Test
     void getGeomagneticStorm() throws NoDataOnSiteException, IOException {
         URL urlResource = ClassLoader.getSystemResource("svpc.json");
@@ -51,7 +37,7 @@ class GeomagneticStormTest {
 
         Method method = GeomagneticStorm.class.getDeclaredMethod("parseGeomagneticStorm", String.class);
         method.setAccessible(true);
-        String returnNewFormat = (String) method.invoke(geomagneticStormClass, formatDate);
+        String returnNewFormat = (String) method.invoke(geomagneticStorm, formatDate);
         String expected = "15.05.2019 14:54:00";
 
         // compare expected and parse time
