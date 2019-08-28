@@ -1,8 +1,6 @@
 bot:
-  token: 884639123:AAGJUFOWF9hoyk4_qM7vNw3YFYHXpsxVAMA
-#  token: ENC(icQT+xI7e1QixTaJEztP+Q==)
+  token: ENC(1TLsc94VESsbG0AncvjDcgtOKIHyVBxLJ5Z08gmk78Gg8lNAXbtol5PB3/uT0xHzH+Is6+fcPfk=)
   username: itover9000_bot
-#  username: ENC(ChB7qI1xGqdqFiJsABMhdpiPVaNWoBy3)
   buttons:
     firstRow:
       - магн. буря
@@ -20,7 +18,7 @@ url:
   urlToGeomagneticSite: https://services.swpc.noaa.gov/json/planetary_k_index_1m.json
 
 yandex:
-  key: key=trnsl.1.1.20190511T083532Z.659a23627272fcf1.ab2b6c844422017a936d29c902783ebb3659700a
+  key: ENC(e5wacm2aD3v2KFIqpfQp1BjLvRU7aXNJO5KM5qYk4xdcAhNtCuBWhreiZQECYZXyVhk2pq0lBykClTMbl2+G+lB7VAbLTC1KdWgaaoYDo6fUMGt8njRtAVokQe0iicgU4P0vyscEvR4=)
   url: https://translate.yandex.net/api/v1.5/tr.json/translate?
 
 currency:
@@ -44,7 +42,7 @@ spring:
   mail:
     host: smtp.yandex.ru
     emailSender: h.dabravolskay@yandex.ru
-    password: tratata88
+    password: ENC(zTpYFhURBaVZVCxrpPknlfQi3Kn9MEJ/)
     port: 465
     protocol: smtps
     emailRecipient: over9000@tut.by

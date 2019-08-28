@@ -13,7 +13,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.TimeZone;
 
 @Service
 public class GeomagneticStorm {
@@ -43,14 +42,11 @@ public class GeomagneticStorm {
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
-        // zoneId local machine
-        ZoneId zoneLocalMachine = ZoneId.of(TimeZone.getDefault().toZoneId().toString());
-        // get localDateTime from json
         LocalDateTime localDateTime = LocalDateTime.parse(dateForParse, inputFormatter);
         //transform localDateTime to zonedDateTime adjusted UTC
         ZonedDateTime zonedDateTimeUtc = ZonedDateTime.of(localDateTime, ZoneOffset.UTC);
         // get zonedDateTime relative to the local time zone
-        ZonedDateTime zonedDateTimeLocalMachine = zonedDateTimeUtc.withZoneSameInstant(zoneLocalMachine);
+        ZonedDateTime zonedDateTimeLocalMachine = zonedDateTimeUtc.withZoneSameInstant(ZoneId.systemDefault());
         return zonedDateTimeLocalMachine.format(outputFormatter);
     }
 

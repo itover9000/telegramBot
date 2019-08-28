@@ -25,9 +25,6 @@ class BoredApiTest {
         // read json from the resources, got the name of the event, the number of participants and translated
         String boredStringFormat = boredApi.getBoredStringFormat(urlResource.toString());
 
-//        assertEquals(new String(String.valueOf(boredStringFormat).getBytes(), StandardCharsets.UTF_8), "Мероприятие: Фотосессия с друзьями\n" +
-//                "Activity:  Have a photo session with some friends\n" +
-//                "Количество участников: 4");
         assertEquals("Мероприятие: Фотосессия с друзьями\n" +
                 "Activity:  Have a photo session with some friends\n" +
                 "Количество участников: 4", boredStringFormat);

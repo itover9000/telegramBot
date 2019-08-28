@@ -32,7 +32,6 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>RELEASE</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.ocpsoft.prettytime/prettytime -->
@@ -130,7 +129,7 @@
         <dependency>
             <groupId>org.junit</groupId>
             <artifactId>junit5-engine</artifactId>
-            <version>RELEASE</version>
+            <version>5.0.0-ALPHA</version>
         </dependency>
 
         <dependency>
@@ -222,6 +221,25 @@
                 <goals>
                     <goal>repackage</goal>
                 </goals>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.4</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

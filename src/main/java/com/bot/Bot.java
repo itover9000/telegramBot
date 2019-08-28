@@ -43,7 +43,6 @@ public class Bot extends TelegramLongPollingBot {
     private final UrlSetting urlSetting;
     private final CurrencySetting currencySetting;
 
-
     @Autowired
     public Bot(GeomagneticStorm geomagneticStorm, BoredApi boredApi, CurrencyInBYN currencyInBYN,
                BotSetting botSetting, WeatherSiteUtil weatherSiteUtil,
@@ -120,7 +119,6 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public String getBotUsername() {
-        logger.info("username: ", botSetting.getUsername());
         return botSetting.getUsername();
     }
 
