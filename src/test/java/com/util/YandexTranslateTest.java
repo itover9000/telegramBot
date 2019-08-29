@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @ExtendWith(SpringExtension.class)
@@ -24,5 +25,7 @@ class YandexTranslateTest {
         //compare translate
         String helloWorld = yandexTranslate.translateFromEngToRu("Hello world");
         assertEquals("Привет мир", helloWorld);
+
+        assertThrows(IOException.class, () -> yandexTranslate.translateFromEngToRu(""));
     }
 }

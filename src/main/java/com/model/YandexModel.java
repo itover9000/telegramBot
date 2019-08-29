@@ -11,8 +11,6 @@ import java.util.List;
 public class YandexModel {
     @SerializedName("code")
     private int code;
-    @SerializedName("lang")
-    private String lang;
     @SerializedName("text")
     private List<String> text;
 }

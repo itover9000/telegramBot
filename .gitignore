@@ -3,3 +3,5 @@
 *.png
 target
 *.log
+/.PVS-Studio/
+/src/main/resources/hello.jpg

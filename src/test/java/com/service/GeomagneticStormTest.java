@@ -1,4 +1,3 @@
-/*
 package com.service;
 
 import com.exception.NoDataOnSiteException;
@@ -44,4 +43,4 @@ class GeomagneticStormTest {
         // compare expected and parse time
         assertEquals(expected, returnNewFormat);
     }
-}*/
+}
