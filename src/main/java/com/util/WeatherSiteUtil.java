@@ -56,7 +56,7 @@ public class WeatherSiteUtil {
         //get element by id
         Element rdr = doc.getElementById("rdr");
 
-        if (!rdr.hasText()) throw new NoDataOnSiteException("Missing data on the site");
+        if (rdr == null || !rdr.hasText()) throw new NoDataOnSiteException("Missing data on the site");
 
         Element elementImg = rdr.getElementsByTag("img").get(0);
         title = elementImg.attr("title");
