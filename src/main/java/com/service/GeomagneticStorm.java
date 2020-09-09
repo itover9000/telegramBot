@@ -28,8 +28,8 @@ public class GeomagneticStorm {
         if (stormModelLastElement != null) {
             //check last kpIndex in List
             StringBuilder returnText = new StringBuilder()
-                    .append("Kp индекс шторма = ").append(stormModelLastElement.getKpIndex()).append("\n")
-                    .append("время ").append(parseGeomagneticStorm(stormModelLastElement.getTimeTag()));
+                .append("Kp индекс шторма = ").append(stormModelLastElement.getKpIndex()).append("\n")
+                .append("время ").append(parseGeomagneticStorm(stormModelLastElement.getTimeTag()));
             if (stormModelLastElement.getKpIndex() > 4) {
                 returnText.append("\nВнимание, сильная буря!");
             }

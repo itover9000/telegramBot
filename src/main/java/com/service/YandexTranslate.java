@@ -29,11 +29,11 @@ public class YandexTranslate {
         String encodeText = URLEncoder.encode(text, StandardCharsets.UTF_8);
 
         StringBuilder fullUrl = new StringBuilder()
-                .append(yandexSettings.getUrl())
-                .append(yandexSettings.getKey())
-                .append("&text=")
-                .append(encodeText)
-                .append("&lang=en-ru");
+            .append(yandexSettings.getUrl())
+            .append(yandexSettings.getKey())
+            .append("&text=")
+            .append(encodeText)
+            .append("&lang=en-ru");
 
         URL url = new URL(fullUrl.toString());
 

@@ -128,17 +128,17 @@ public class WeatherSiteUtil {
     String parseTitleForGettingTime(String text) {
         // return time from the text in the format HH: mm
         return Arrays.stream(text.split("\\s"))
-                .filter(validator::isValidateTime24)
-                .findFirst()
-                .orElse("");
+            .filter(validator::isValidateTime24)
+            .findFirst()
+            .orElse("");
     }
 
     String parseTitleForGettingDate(String text) {
         //return the date from the text in the format dd.mm
         return Arrays.stream(text.split("\\s"))
-                .filter(validator::isValidateDate)
-                .findFirst()
-                .orElse("");
+            .filter(validator::isValidateDate)
+            .findFirst()
+            .orElse("");
     }
 
     private void copyGifToRootProject(File file, URL website) throws IOException {

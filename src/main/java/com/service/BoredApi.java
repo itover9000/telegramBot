@@ -24,9 +24,9 @@ public class BoredApi {
         BoredModel boredModel = transformObjectFromJson.getObjectFromJson(urlBored, BoredModel.class);
 
         StringBuilder answer = new StringBuilder()
-                .append("Мероприятие: ").append(yandexTranslate.translateFromEngToRu(boredModel.getActivity())).append("\n")
-                .append("Activity:  ").append(boredModel.getActivity()).append("\n")
-                .append("Количество участников: ").append(boredModel.getParticipants());
+            .append("Мероприятие: ").append(yandexTranslate.translateFromEngToRu(boredModel.getActivity())).append("\n")
+            .append("Activity:  ").append(boredModel.getActivity()).append("\n")
+            .append("Количество участников: ").append(boredModel.getParticipants());
 
         return answer.toString();
     }

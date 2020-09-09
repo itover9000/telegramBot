@@ -43,10 +43,10 @@ public class CurrencyInBYN {
             }
 
             finalMessage
-                    .append(currencyModel.getCurAbbreviation())
-                    .append(" равен ")
-                    .append(currencyModel.getCurOfficialRate())
-                    .append("\n");
+                .append(currencyModel.getCurAbbreviation())
+                .append(" равен ")
+                .append(currencyModel.getCurOfficialRate())
+                .append("\n");
         }
         return finalMessage.toString();
     }

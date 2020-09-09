@@ -13,5 +13,5 @@ import java.util.Map;
 public class BotSetting {
     private String token;
     private String username;
-    private Map< String, List<String>> buttons;
+    private Map<String, List<String>> buttons;
 }

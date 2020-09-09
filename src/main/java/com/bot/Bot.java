@@ -61,20 +61,20 @@ public class Bot extends TelegramLongPollingBot {
 
         if (message != null && message.hasText()) {
             switch (message.getText().toLowerCase().strip()) {
-                case "магн. буря" -> {
+                case "магн. буря":
                     try {
                         sendMsg(message, geomagneticStorm.getGeomagneticStorm(urlSetting.getUrlToGeomagneticSite()));
                     } catch (IOException | NoDataOnSiteException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
                     }
-                }
-                case "текущая погода" -> {
+                    break;
+                case "текущая погода":
                     try {
                         //send a picture from the site, mark the place on the map
                         execute(new SendPhoto()
-                                .setPhoto(new File(weatherSiteUtil.getMapWithVillage(urlSetting.getGifFileNameFromMeteoinfo())))
-                                .setChatId(message.getChatId().toString()));
+                            .setPhoto(new File(weatherSiteUtil.getMapWithVillage(urlSetting.getGifFileNameFromMeteoinfo())))
+                            .setChatId(message.getChatId().toString()));
 
                         //picture time message
                         sendMsg(message, "погода " + weatherSiteUtil.getTimeFromTitleAndCompareDifferenceWithCurrentTime());
@@ -82,38 +82,39 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
                     }
-                }
-                case "анимация погоды" -> {
+                    break;
+                case "анимация погоды":
                     try {
                         //send animation about the weather for the last 3 hours
                         execute(new SendVideo()
-                                .setVideo(new File(
-                                        weatherSiteUtil.getPathToFileInRootProject(
-                                                urlSetting.getUrlToGifFile(),
-                                                urlSetting.getGifFileNameFromMeteoinfo())))
-                                .setChatId(message.getChatId().toString()));
+                            .setVideo(new File(
+                                weatherSiteUtil.getPathToFileInRootProject(
+                                    urlSetting.getUrlToGifFile(),
+                                    urlSetting.getGifFileNameFromMeteoinfo())))
+                            .setChatId(message.getChatId().toString()));
                     } catch (TelegramApiException | IOException | InvalidUrlException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
                     }
-                }
-                case "скучно!" -> {
+                    break;
+                case "скучно!":
                     try {
                         sendMsg(message, boredApi.getBoredStringFormat(urlSetting.getUrlToBoredapi()));
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
                     }
-                }
-                case "курс валют" -> {
+                    break;
+                case "курс валют":
                     try {
                         sendMsg(message, currencyInBYN.getCurrency(currencySetting.getUrlApi()));
                     } catch (IOException e) {
                         sendMsg(message, MESSAGE_ANSWER);
                         logger.error(ERROR_MESSAGE, e);
                     }
-                }
-                default -> sendMsg(message, "Неизвестная команда");
+                    break;
+                default:
+                    sendMsg(message, "Неизвестная команда");
             }
         }
     }

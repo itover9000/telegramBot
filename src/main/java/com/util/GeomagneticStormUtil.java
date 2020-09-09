@@ -45,19 +45,19 @@ public class GeomagneticStormUtil {
         List<GeomagneticStormModel> listStormModelFromJson = transformObjectFromJson.getListObjectsFromJson(urlStorm, GeomagneticStormModel.class);
 
         return listStormModelFromJson.stream().reduce((first, second) -> second)
-                .orElseThrow(() -> new NoDataOnSiteException(MESSAGE_LOGGER));
+            .orElseThrow(() -> new NoDataOnSiteException(MESSAGE_LOGGER));
     }
 
     // check storm every 15 minutes, if kpIndex > 4, then will be sent message to email
     @Scheduled(fixedRate = 15 * 1000 * 1000)
     private void check() {
         StringBuilder description = new StringBuilder()
-                .append("\nКачественно состояние магнитного поля в зависимости от Кp индекса\n")
-                .append("Kp <= 2 — спокойное;\n")
-                .append("Kp = 2, 3 — слабовозмущенное; \n")
-                .append("Kp = 4 — возмущенное; \n")
-                .append("Kp = 5, 6 — магнитная буря; \n")
-                .append("Kp >= 7 — сильная магнитная буря.");
+            .append("\nКачественно состояние магнитного поля в зависимости от Кp индекса\n")
+            .append("Kp <= 2 — спокойное;\n")
+            .append("Kp = 2, 3 — слабовозмущенное; \n")
+            .append("Kp = 4 — возмущенное; \n")
+            .append("Kp = 5, 6 — магнитная буря; \n")
+            .append("Kp >= 7 — сильная магнитная буря.");
 
         try {
             GeomagneticStormModel stormModelForCheck = getStormModel(urlSetting.getUrlToGeomagneticSite());
